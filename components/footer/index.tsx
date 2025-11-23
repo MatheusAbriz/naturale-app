@@ -1,13 +1,10 @@
 import { FooterView, IconContainer, TextIcon } from "./styles";
 import { theme } from "@/globals/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text } from "react-native";
 import House from '@react-native-vector-icons/lucide';
 import FavoriteBorder from 'react-native-vector-icons/MaterialIcons';
 import ChatBubbleOutline from '@react-native-vector-icons/ionicons';
 import { useRoute } from "@react-navigation/native";
-import { useEffect } from "react";
-
 export function Footer(){
     const insets = useSafeAreaInsets();
     const route = useRoute();
