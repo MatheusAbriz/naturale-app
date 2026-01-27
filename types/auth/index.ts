@@ -1,17 +1,16 @@
-import { AuthContextProvider } from '../../contexts/authContext';
 export type User = {
     id: number;
     email: string;
-    apelido: string;
-    tipo: string;
+    username: string;
+    role: string;
     avatar: string;
     token: string;
 };
 
 export type AuthContextType = {
-    user: User;
-    signIn: () => void;
-    logout: () => void;
+    user: User | undefined;
+    signIn: (email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
 };
 
 export type AuthContextProviderProps = {
