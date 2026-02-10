@@ -1,10 +1,16 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Text } from "react-native";
+import { Input } from "@/components/inputs/input";
+import { useForm } from "react-hook-form";
+import { Container } from "./styles";
 
 export default function Login() {
+    const { control } = useForm();
     return (
-        <SafeAreaView>
-            <Text>Login Page</Text>
-        </SafeAreaView>
+        <Container>
+            <Input
+                name="email"
+                placeholder="exemplo@gmail.com"
+                control={control}
+            />
+        </Container>
     )
 };
