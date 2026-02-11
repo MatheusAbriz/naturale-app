@@ -1,14 +1,15 @@
 import { InputText } from "@/globals/inputs";
 import { Control, Controller, FieldValues } from "react-hook-form";
+import { TextInputProps } from "react-native";
 
-type InputProps = {
+type InputProps = TextInputProps & {
     name: string;
     control: Control<FieldValues>;
     placeholder: string;
     autoCapitalize?: "none"
 }
 
-export function Input({ name, placeholder, autoCapitalize="none", control }: InputProps) {
+export function Input({ name, placeholder, autoCapitalize="none", control, ...rest }: InputProps) {
     return (
         <Controller
             control={control}
@@ -19,6 +20,7 @@ export function Input({ name, placeholder, autoCapitalize="none", control }: Inp
                     value={value}
                     onChangeText={onChange}
                     autoCapitalize={autoCapitalize}
+                    {...rest}
                 />
             )}
         >

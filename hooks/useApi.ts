@@ -9,18 +9,22 @@ export const API = axios.create({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${user?.token}`
     }
-});
+}); 
 
 type UseQueryApiProps<T> = {
     queryKey: any[];
     queryFn: () => Promise<AxiosResponse<T>>;
+    staleTime: number;
+    gcTime: number;
 };
 
-export function useApi<T>({ queryKey,queryFn }: UseQueryApiProps<T>): UseQueryResult<T> & { request: () => Promise<any>; } {
+export function useApi<T>({ queryKey, queryFn, staleTime, gcTime }: UseQueryApiProps<T>): UseQueryResult<T> & { request: () => Promise<any>; } {
     const query = useQuery({
         queryKey,
         queryFn,
         enabled: false,
+        staleTime,
+        gcTime,
         select: (res: AxiosResponse<T>) => res.data
     });
 

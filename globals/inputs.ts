@@ -5,5 +5,5 @@ export const InputText = styled.TextInput`
     background-color: ${theme.colors.buttonBackground};
     border-radius: ${theme.paddings.m};
 
-    font-size: 12px;
+    font-size: 14px;
 `;
