@@ -5,7 +5,8 @@ export const theme = {
         white: "#FFF",
         lightWhite: "#F2F2F2",
         lightBlack: "#2F4F4F",
-        buttonBackground: "#D9D9D9"
+        buttonBackground: "#D9D9D9",
+        lightGray: "#D3D3D3"
     },
     paddings: {
         s: "4px",

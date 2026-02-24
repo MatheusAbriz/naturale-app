@@ -17,6 +17,7 @@ export function Input({ name, placeholder, autoCapitalize="none", control, ...re
             render={({ field: { onChange, value } }) => (
                 <InputText
                     placeholder={placeholder}
+                    placeholderTextColor="#999"
                     value={value}
                     onChangeText={onChange}
                     autoCapitalize={autoCapitalize}
