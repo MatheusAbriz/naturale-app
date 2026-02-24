@@ -43,6 +43,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "API_URL": "https://api-6yuvneknga-uc.a.run.app"
     }
   }
 }

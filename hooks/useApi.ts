@@ -1,10 +1,12 @@
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import axios, { AxiosResponse } from 'axios';
+import Constants from "expo-constants";
 import { useAuth } from './useAuth';
 
 const { user } = useAuth();
+const API_URL = Constants.expoConfig?.extra?.API_URL;
 export const API = axios.create({
-    baseURL: import.meta.env.REACT_APP_BASE_URL,
+    baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${user?.token}`

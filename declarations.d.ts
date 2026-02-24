@@ -8,3 +8,7 @@ declare module "*.svg" {
     const content: React.FC<SvgProps>;
     export default content;
 }
+
+interface ImportMeta {
+  readonly env: Record<string, string>;
+}

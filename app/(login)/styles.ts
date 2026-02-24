@@ -1,4 +1,5 @@
 import { Button } from "@/components/buttons";
+import { NormalText } from "@/globals/texts";
 import { theme } from "@/globals/theme";
 import { ImageBackground as RnImageBackground } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -44,10 +45,29 @@ export const LoginButton = styled(Button)`
     background-color: ${theme.colors.orange};
 `;
 
+export const Text = styled(NormalText)`
+    color: ${theme.colors.lightOrange};
+    font-weight: 800;
+    text-align: center;
+
+    font-size: 16px;
+`;
+
+export const SubText = styled(NormalText)`
+    color: ${theme.colors.buttonBackground};
+    text-align: center;
+`;
+
+export const Span = styled(SubText)`
+    font-weight: 800;
+`;
+
 export const Divider = styled.View`
     width: 100%;
     height: 1px;
 
     border-radius: 25px;
     background-color: ${theme.colors.lightGray};
+
+    margin-top: 8px;
 `;
