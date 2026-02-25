@@ -1,3 +1,4 @@
+import { setAuthToken } from "@/hooks/useApi";
 import { useLoader } from "@/hooks/useLoader";
 import { AuthContextProviderProps, AuthContextType, User } from "@/types/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,19 +11,24 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const { setLoading } = useLoader();
 
   const isLogged = async () => {
-    setLoading(true);
-    const userFromStorage = await AsyncStorage.getItem("user");
-    if(!userFromStorage) return false;
+    try {
+      setLoading(true);
+      const userFromStorage = await AsyncStorage.getItem("user");
+      if(!userFromStorage) return false;
 
-    const parsedUser = JSON.parse(userFromStorage);
-    setUser(parsedUser);
-    setLoading(false);
-    return true;
+      const parsedUser: User = JSON.parse(userFromStorage);
+      setUser(parsedUser);
+      setAuthToken(parsedUser?.token);
+      
+      return true;
+    } catch { }
+    finally {
+      setLoading(false);
+    }
   }
 
   const signIn = async (data: User) => {
     try {
-      //TODO: Implementar login e authenticacao
       await AsyncStorage.setItem("user", JSON.stringify(data));
       setUser(data);
     } catch (err) {
@@ -35,6 +41,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const logout = async () => {
     await AsyncStorage.removeItem("user");
     setUser(null);
+    setAuthToken(undefined);
   };
 
   useEffect(() => {

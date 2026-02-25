@@ -30,7 +30,7 @@ export default function Login() {
                 role: res?.data?.type
             }
             
-            signIn(payload);
+            await signIn(payload);
             toast.success("Logado realizado com sucesso, seja bem-vindo!");
             router.push("/(home)");
         } catch (e) {

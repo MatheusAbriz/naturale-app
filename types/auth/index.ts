@@ -9,6 +9,14 @@ export type User = {
   token: string;
 };
 
+export type UserSimpleDetails = {
+  id: number,
+  name: string,
+  username: string,
+  avatar: string,
+  type: UserRoles
+}
+
 export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
