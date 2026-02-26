@@ -1,6 +1,7 @@
 import { Posts } from "@/types/posts/PostTypes";
 import { useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
+import { Avatar } from "../avatar";
 import { Button } from "../buttons";
 import { Box } from "../ui/box";
 import { Card } from "../ui/card";
@@ -27,6 +28,7 @@ export function PostCard({ post }: CardProps) {
                 {post?.title}
             </Text>
             <View className="flex-row mb-6 gap-6">
+                <Avatar/>
                 <Heading 
                     size="md" 
                     className="mb-4"
