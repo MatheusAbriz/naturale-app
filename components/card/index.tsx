@@ -20,17 +20,17 @@ export function PostCard({ post }: CardProps) {
     return (
     <Card className="p-0 w-full mx-auto bg-[#F2F2F2] border-b border-gray-300">
         <Box className="flex-row items-center gap-3 py-3 px-3">
-            <Avatar/>
+            <Avatar url={post?.user?.avatar}/>
             <Heading 
                 size="md" 
                 style={{ flexShrink: 0, color: theme.colors.heavyBlack }}
             >
-                {post?.user?.username}
+                {post?.user?.username ?? post?.user?.name}
             </Heading>
         </Box>
         <Image
             source={{
-            uri: 'https://gluestack.github.io/public-blog-video-assets/saree.png',
+            uri: `${post?.image}`,
             }}
             className="mb-6 h-[280px] w-full"
             alt="image"
