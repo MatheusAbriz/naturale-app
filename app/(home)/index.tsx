@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/skeleton";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { getPosts } from "@/services/PostService";
-import { ScrollView } from "react-native";
+import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
@@ -19,18 +19,21 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView 
+        <FlatList 
           style={{ width: "100%" }}
           contentContainerStyle={{ paddingBottom: 60 }}
-        >
-          {isFetching ? (
-            <Skeleton count={6}/>
-          ) : (
-            posts?.data?.map((post) => (
-              <PostCard key={post.postId} post={post} />
-            ))
-          )}
-        </ScrollView>
+          data={isFetching ? Array(6).fill({}) : posts?.data ?? []}
+          keyExtractor={(item, index) => 
+            isFetching ? index?.toString() : item?.postId?.toString()
+          }
+          renderItem={({ item }) => 
+            isFetching ? (
+              <Skeleton />
+            ) : (
+              <PostCard post={item} />
+            )
+          }
+        />
       </SafeAreaView>
     </ProtectedRoute>
   );

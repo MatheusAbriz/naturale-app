@@ -5,8 +5,9 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { theme } from "@/globals/theme";
 import { Posts } from "@/types/posts/PostTypes";
-import { useState } from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
+import { memo, useState } from "react";
+import { TouchableOpacity, View } from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import IonIcon from "react-native-vector-icons/Ionicons";
@@ -15,7 +16,7 @@ type CardProps = {
     post: Posts;
 }
 
-export function PostCard({ post }: CardProps) {
+export const PostCard = memo(function PostCard({ post }: CardProps) {
     const [expanded, setExpanded] = useState(false);
     return (
     <Card className="p-0 w-full mx-auto bg-[#F2F2F2] border-b border-gray-300">
@@ -30,10 +31,11 @@ export function PostCard({ post }: CardProps) {
         </Box>
         <Image
             source={{
-            uri: `${post?.image}`,
+                uri: post.image,
             }}
-            className="mb-6 h-[280px] w-full"
-            alt="image"
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            style={{ width: '100%', height: 280, marginBottom: 16 }}
         />
         <Box className="flex-row items-center justify-between gap-3 px-3">
             <Box className="flex-row gap-4 items-center">
@@ -64,7 +66,7 @@ export function PostCard({ post }: CardProps) {
                         {post?.text}
                     </Text>
 
-                    {!expanded && post?.text?.length > 34 && (
+                    {!expanded && post?.text?.length > 50 && (
                         <TouchableOpacity
                             onPress={() => setExpanded(true)}
                         >
@@ -97,4 +99,4 @@ export function PostCard({ post }: CardProps) {
         </Box>
     </Card>
     )
-}
+})
