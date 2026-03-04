@@ -1,10 +1,12 @@
 import { LoaderProvider } from "@/contexts/loaderContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { Footer } from "@/components/footer";
 import { Loader } from "@/components/loader";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { AuthContextProvider } from "@/contexts/authContext";
 import "@/global.css";
+import { useAuth } from "@/hooks/useAuth";
 import { useLoader } from "@/hooks/useLoader";
 import { Toasts } from "@backpackapp-io/react-native-toast";
 import { Stack } from "expo-router";
@@ -30,11 +32,13 @@ export default function RootLayout() {
 
 function RootContent() {
   const { loading } = useLoader();
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
       {loading && <Loader />}
       <Stack screenOptions={{ headerShown: false }} />
+      {isAuthenticated && <Footer />}
     </>
   );
 }

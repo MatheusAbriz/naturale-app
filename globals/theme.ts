@@ -6,8 +6,11 @@ export const theme = {
         white: "#FFF",
         lightWhite: "#F2F2F2",
         lightBlack: "#2F4F4F",
+        black: "#212121",
+        heavyBlack: "#111",
         buttonBackground: "#D9D9D9",
-        lightGray: "#D3D3D3"
+        lightGray: "#D3D3D3",
+        heavyGray: "#CCC",
     },
     paddings: {
         s: "4px",

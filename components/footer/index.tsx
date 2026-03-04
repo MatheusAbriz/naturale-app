@@ -10,7 +10,7 @@ export function Footer() {
   const route = useRoute();
 
   return (
-    <FooterView style={{ paddingBottom: insets.bottom }}>
+    <FooterView style={{ height: 60 + insets.bottom, paddingBottom: insets.bottom }}>
       <IconContainer isActive={route.name.includes("(home)")}>
         <TextIcon isActive={route.name.includes("(home)")}>Início</TextIcon>
         <House name="house" size={24} color={theme.colors.lightGreen} />

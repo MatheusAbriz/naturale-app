@@ -1,5 +1,4 @@
 import { PostCard } from "@/components/card";
-import { Footer } from "@/components/footer";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { UserRoles } from "@/enums/AuthEnums";
 import { Posts } from "@/types/posts/PostTypes";
@@ -105,7 +104,10 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView style={{ width: "100%" }}>
+        <ScrollView 
+          style={{ width: "100%" }}
+          contentContainerStyle={{ paddingBottom: 60 }}
+        >
           {isLoading ? (
             // TODO: Implementar Skeleton
             <Text>Carregando...</Text>
@@ -114,7 +116,6 @@ export default function Home() {
               <PostCard post={post} />
             ))
           )}
-          <Footer />
         </ScrollView>
       </SafeAreaView>
     </ProtectedRoute>

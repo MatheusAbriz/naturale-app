@@ -13,6 +13,7 @@ export const FooterView = styled.View`
     align-items: center;
     padding: ${theme.paddings.l};
     background-color: ${theme.colors.white};
+    height: 60px;
 `;
 
 export const IconContainer = styled.View<{ isActive: boolean }>`

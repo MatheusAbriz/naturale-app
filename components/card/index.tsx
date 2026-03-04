@@ -1,12 +1,15 @@
+import { Avatar } from "@/components/avatar";
+import { Box } from "@/components/ui/box";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
+import { theme } from "@/globals/theme";
 import { Posts } from "@/types/posts/PostTypes";
 import { useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
-import { Avatar } from "../avatar";
-import { Button } from "../buttons";
-import { Box } from "../ui/box";
-import { Card } from "../ui/card";
-import { Heading } from "../ui/heading";
-import { Text } from "../ui/text";
+import FeatherIcon from "react-native-vector-icons/Feather";
+import AwesomeIcon from "react-native-vector-icons/FontAwesome";
+import IonIcon from "react-native-vector-icons/Ionicons";
 
 type CardProps = {
     post: Posts;
@@ -15,33 +18,48 @@ type CardProps = {
 export function PostCard({ post }: CardProps) {
     const [expanded, setExpanded] = useState(false);
     return (
-    <Card className="p-0 rounded-lg w-full max-w-[360px] mx-auto my-3">
+    <Card className="p-0 w-full mx-auto bg-[#F2F2F2] border-b border-gray-300">
+        <Box className="flex-row items-center gap-3 py-3 px-3">
+            <Avatar/>
+            <Heading 
+                size="md" 
+                style={{ flexShrink: 0, color: theme.colors.heavyBlack }}
+            >
+                {post?.user?.username}
+            </Heading>
+        </Box>
         <Image
             source={{
             uri: 'https://gluestack.github.io/public-blog-video-assets/saree.png',
             }}
-            className="mb-6 h-[240px] max-w-[360px] rounded-lg"
+            className="mb-6 h-[280px] w-full"
             alt="image"
         />
-        <Box className="p-5">
-            <Text className="text-lg font-normal mb-2 text-typography-700">
+        <Box className="flex-row items-center justify-between gap-3 px-3">
+            <Box className="flex-row gap-4 items-center">
+                <Box className="flex-row gap-2 items-center">
+                    <FeatherIcon name="heart" size={20} color={theme.colors.black} />
+                    <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
+                </Box>
+                <Box className="flex-row gap-2 items-center">
+                    <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
+                    <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
+                </Box>
+            </Box>
+            <Box className="flex-row items-center">
+                <FeatherIcon name="bookmark" size={20} color={theme.colors.black} /> 
+            </Box>
+        </Box>
+        <Box className="p-3">
+            <Text className="text-xl mb-2 text-typography-700 font-semibold" style={{ color: theme.colors.lightBlack }}>
                 {post?.title}
             </Text>
-            <View className="flex-row mb-6 gap-6">
-                <Avatar/>
-                <Heading 
-                    size="md" 
-                    className="mb-4"
-                    style={{ flexShrink: 0 }}
-                >
-                    {post?.user?.username}
-                </Heading>
-
+            <View className="flex-row mb-1 gap-6">
                 <View style={{ flex: 1 }}>
                     <Text 
-                        size="sm"
+                        size="md"
                         numberOfLines={expanded ? undefined : 1}
-                        style={{ lineHeight: 20 }}
+                        style={{ lineHeight: 20, color: theme.colors.lightBlack }}
                     >
                         {post?.text}
                     </Text>
@@ -51,8 +69,8 @@ export function PostCard({ post }: CardProps) {
                             onPress={() => setExpanded(true)}
                         >
                             <Text 
-                                className="sm mt-2"
-                                style={{ color: "#999" }}
+                                className="text-sm mt-2"
+                                style={{ color: theme.colors.lightBlack }}
                             >
                                 Ver mais...
                             </Text>
@@ -63,23 +81,19 @@ export function PostCard({ post }: CardProps) {
                             onPress={() => setExpanded(false)}
                         >
                             <Text 
-                                className="sm mt-2"
+                                className="text-sm mt-2"
+                                style={{ color: theme.colors.lightBlack }}
                             >
                                Ver menos
                             </Text>
                         </TouchableOpacity>
                     )}
+                    <Box className="flex-row items-center gap-2 mt-4">
+                        <IonIcon name="timer-outline" size={16} color={theme.colors.lightBlack} />
+                        <Text className="text-xs" style={{ color: theme.colors.lightBlack }}>{post?.time}</Text>
+                    </Box>
                 </View>
             </View>
-            {/* <VStack className="mb-6 flex-row gap-x-4 ">
-            </VStack> */}
-            <Box className="flex-col sm:flex-row">
-                <Button 
-                    title="Add to cart"
-                    onPress={() => console.log("Hi there")}
-                />
-            </Box>
-
         </Box>
     </Card>
     )
