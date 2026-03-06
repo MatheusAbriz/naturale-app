@@ -37,7 +37,9 @@ function RootContent() {
   return (
     <>
       {loading && <Loader />}
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack 
+        screenOptions={{ headerShown: false }}
+        />
       {isAuthenticated && <Footer />}
     </>
   );
