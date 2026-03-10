@@ -2,6 +2,7 @@ import { UserSimpleDetails } from "../auth"
 
 export type Posts = {
     postId: number,
+    post_id?: number,
     title: string,
     text: string,
     ingredients: string,

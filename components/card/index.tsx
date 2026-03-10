@@ -4,7 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { theme } from "@/globals/theme";
+import { useLoader } from "@/hooks/useLoader";
+import { insertFavorite, insertLike } from "@/services/PostService";
+import { Paginated } from "@/types/pagination/PaginationTypes";
 import { Posts } from "@/types/posts/PostTypes";
+import { toast } from "@backpackapp-io/react-native-toast";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { memo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -14,10 +19,46 @@ import IonIcon from "react-native-vector-icons/Ionicons";
 
 type CardProps = {
     post: Posts;
+    onOpenComments?: (post: Posts) => void;
+    onSuccess: (options?: RefetchOptions) => Promise<QueryObserverResult<Paginated<Posts[]>, Error>>;
 }
 
-export const PostCard = memo(function PostCard({ post }: CardProps) {
+export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments }: CardProps) {
+    const { setLoading } = useLoader();
     const [expanded, setExpanded] = useState(false);
+
+    async function toggleLike() {
+        try {
+            setLoading(true);
+            const postId = post?.post_id
+            const userId = post?.user?.id
+            await insertLike(postId!, userId);
+            onSuccess();
+        } catch(e) {
+            console.error(e);
+            toast.error("Erro! Tente novamente mais tarde");
+        }
+        finally {
+            setLoading(false);
+        }
+    };
+
+    async function toggleFavorite() {
+        try {
+            setLoading(true);
+            const postId = post?.post_id;
+            const userId = post?.user?.id;
+
+            await insertFavorite(postId!, userId);
+            onSuccess();
+        } catch (e) {
+            console.error(e);
+            toast.error("Erro! Tente novamente mais tarde");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
     <Card className="p-0 w-full mx-auto bg-[#F2F2F2] border-b border-gray-300">
         <Box className="flex-row items-center gap-3 py-3 px-3">
@@ -40,16 +81,22 @@ export const PostCard = memo(function PostCard({ post }: CardProps) {
         <Box className="flex-row items-center justify-between gap-3 px-3">
             <Box className="flex-row gap-4 items-center">
                 <Box className="flex-row gap-2 items-center">
-                    <FeatherIcon name="heart" size={20} color={theme.colors.black} />
+                    <TouchableOpacity onPress={toggleLike}>
+                        <FeatherIcon name="heart" size={20} color={theme.colors.black} />
+                    </TouchableOpacity>
                     <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
                 </Box>
                 <Box className="flex-row gap-2 items-center">
-                    <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
+                    <TouchableOpacity onPress={() => onOpenComments(post)}>
+                        <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
+                    </TouchableOpacity>
                     <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
                 </Box>
             </Box>
             <Box className="flex-row items-center">
-                <FeatherIcon name="bookmark" size={20} color={theme.colors.black} /> 
+                <TouchableOpacity onPress={toggleFavorite}>
+                    <FeatherIcon name="bookmark" size={20} color={theme.colors.black} />
+                </TouchableOpacity>
             </Box>
         </Box>
         <Box className="p-3">

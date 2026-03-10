@@ -4,6 +4,8 @@ import { Skeleton } from "@/components/skeleton";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { getPosts } from "@/services/PostService";
+import { Posts } from "@/types/posts/PostTypes";
+import { useState } from "react";
 import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,6 +18,7 @@ export default function Home() {
     staleTime: 60 * 1000, // 1 minuto
     gcTime: 15 * 60 * 1000 // 15 minutos
   });
+  const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
 
   return (
     <ProtectedRoute>
@@ -31,7 +34,7 @@ export default function Home() {
             isLoading ? (
               <Skeleton />
             ) : (
-              <PostCard post={item} />
+              <PostCard post={item} onSuccess={refetch} onOpenComments={setSelectedPost}/>
             )
           }
           refreshing={isFetching}

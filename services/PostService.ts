@@ -5,3 +5,11 @@ import { Posts } from "@/types/posts/PostTypes";
 export function getPosts() {
     return API.get<Paginated<Posts[]>>("/posts");
 }
+
+export function insertLike(postId: number | string, userId: number | string) {
+    return API.patch(`/posts/${postId}/like/${userId}`);
+}
+
+export function insertFavorite(userId: number | string, postId: number | string) {
+    return API.patch(`/favorites/${userId}/${postId}`);
+}
