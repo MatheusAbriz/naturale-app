@@ -1,37 +1,73 @@
 import { Posts } from "@/types/posts/PostTypes";
-import { useState } from "react";
-import { Actionsheet, ActionsheetBackdrop, ActionsheetContent, ActionsheetDragIndicator, ActionsheetDragIndicatorWrapper, ActionsheetItem, ActionsheetItemText } from "../ui/actionsheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import React, { useCallback, useEffect, useRef } from "react";
+import { Text, TouchableOpacity } from "react-native";
 
-//TODO: Continuar a implementação do post daqui
 type CommentProps = {
-    post: Posts,
+    post: Posts | null,
+    isOpen: boolean,
+    onClose: () => void
 }
 
-export default function Comment({ post }: CommentProps) {
-    const [showAction, setShowAction] = useState(false);
+export default function Comment({ post, isOpen, onClose }: CommentProps) {
+    const bottomSheetRef = useRef<BottomSheet>(null);
+
+    useEffect(() => {
+        if (isOpen) bottomSheetRef.current?.expand();
+        else bottomSheetRef.current?.close();
+    }, [isOpen]);
+
+    const renderBackdrop = useCallback(
+        (props: any) => (
+            <BottomSheetBackdrop
+                {...props}
+                disappearsOnIndex={-1}
+                appearsOnIndex={0}
+                pressBehavior="close" 
+            />
+        ),
+        []
+    );
+
+    const handleSheetChanges = useCallback((index: number) => {
+        if (index === -1) {
+            onClose();
+        }
+    }, [onClose]);
+
     return (
-        <Actionsheet isOpen={showAction} onClose={() => setShowAction(false)}>
-        <ActionsheetBackdrop />
-        <ActionsheetContent>
-        <ActionsheetDragIndicatorWrapper>
-            <ActionsheetDragIndicator />
-        </ActionsheetDragIndicatorWrapper>
-        <ActionsheetItem onPress={() => setShowAction(false)}>
-            <ActionsheetItemText>Edit Message</ActionsheetItemText>
-        </ActionsheetItem>
-        <ActionsheetItem onPress={() => setShowAction(false)}>
-            <ActionsheetItemText>Mark Unread</ActionsheetItemText>
-        </ActionsheetItem>
-        <ActionsheetItem onPress={() => setShowAction(false)}>
-            <ActionsheetItemText>Remind Me</ActionsheetItemText>
-        </ActionsheetItem>
-        <ActionsheetItem onPress={() => setShowAction(false)}>
-            <ActionsheetItemText>Add to Saved Items</ActionsheetItemText>
-        </ActionsheetItem>
-        <ActionsheetItem isDisabled onPress={() => setShowAction(false)}>
-            <ActionsheetItemText>Delete</ActionsheetItemText>
-        </ActionsheetItem>
-        </ActionsheetContent>
-    </Actionsheet>
-    )
+        <BottomSheet
+            ref={bottomSheetRef}
+            index={-1} 
+            snapPoints={['40%', '50%']} 
+            enablePanDownToClose={true} 
+            onChange={handleSheetChanges}
+            backdropComponent={renderBackdrop}
+            backgroundStyle={{ backgroundColor: '#FFF' }} 
+            handleIndicatorStyle={{ backgroundColor: '#CCC', width: 40 }} 
+        >
+            <BottomSheetView className="flex-1 px-5 pt-3">
+                <TouchableOpacity className="py-4 border-b border-[#F0F0F0]" onPress={onClose}>
+                    <Text className="text-base text-[#333333] font-medium">Edit Message</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity className="py-4 border-b border-[#F0F0F0]" onPress={onClose}>
+                    <Text className="text-base text-[#333333] font-medium">Mark Unread</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity className="py-4 border-b border-[#F0F0F0]" onPress={onClose}>
+                    <Text className="text-base text-[#333333] font-medium">Remind Me</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity className="py-4 border-b border-[#F0F0F0]" onPress={onClose}>
+                    <Text className="text-base text-[#333333] font-medium">Add to Saved Items</Text>
+                </TouchableOpacity>                
+                
+                <TouchableOpacity className="py-4 border-b-0 mt-2" onPress={onClose}>
+                    <Text className="text-base text-[#FF3B30] font-medium">Delete</Text>
+                </TouchableOpacity>
+
+            </BottomSheetView>
+        </BottomSheet>
+    );
 }

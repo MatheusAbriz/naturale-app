@@ -1,11 +1,12 @@
 import { PostCard } from "@/components/card";
+import Comment from "@/components/comment";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { getPosts } from "@/services/PostService";
 import { Posts } from "@/types/posts/PostTypes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,6 +21,11 @@ export default function Home() {
   });
   const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
 
+  useEffect(() => {
+    console.log("isOpen", !!selectedPost);
+    console.log("post", selectedPost);
+  }, [selectedPost]);
+
   return (
     <ProtectedRoute>
       <SafeAreaView style={{ flex: 1 }}>
@@ -28,7 +34,7 @@ export default function Home() {
           contentContainerStyle={{ paddingBottom: 60 }}
           data={isLoading ? Array(6).fill({}) : posts?.data ?? []}
           keyExtractor={(item, index) => 
-            isLoading ? index?.toString() : item?.postId?.toString()
+            isLoading ? index?.toString() : item?.post_id?.toString()
           }
           renderItem={({ item }) => 
             isLoading ? (
@@ -41,6 +47,11 @@ export default function Home() {
           onRefresh={refetch}
         />
       </SafeAreaView>
+      <Comment
+        post={selectedPost}
+        isOpen={!!selectedPost}
+        onClose={() => setSelectedPost(null)}
+      />
     </ProtectedRoute>
   );
 }

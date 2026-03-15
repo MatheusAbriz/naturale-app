@@ -19,7 +19,7 @@ import IonIcon from "react-native-vector-icons/Ionicons";
 
 type CardProps = {
     post: Posts;
-    onOpenComments?: (post: Posts) => void;
+    onOpenComments: React.Dispatch<React.SetStateAction<Posts | null>>;
     onSuccess: (options?: RefetchOptions) => Promise<QueryObserverResult<Paginated<Posts[]>, Error>>;
 }
 
@@ -87,7 +87,7 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
                     <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
                 </Box>
                 <Box className="flex-row gap-2 items-center">
-                    <TouchableOpacity onPress={() => onOpenComments(post)}>
+                    <TouchableOpacity onPress={() => onOpenComments(post!)}>
                         <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
                     </TouchableOpacity>
                     <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
