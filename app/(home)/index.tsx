@@ -12,10 +12,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   // TODO: Ver possibilidade de caching mais avançado
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { data: posts, isFetching, isLoading, refetch } = useApi({
     queryFn: getPosts,
     queryKey: ["posts", user?.id],
+    enabled: !!user,
     staleTime: 60 * 1000, // 1 minuto
     gcTime: 15 * 60 * 1000 // 15 minutos
   });

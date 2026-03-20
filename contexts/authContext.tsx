@@ -30,6 +30,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const signIn = async (data: User) => {
     try {
       await AsyncStorage.setItem("user", JSON.stringify(data));
+      setAuthToken(data?.token);
       setUser(data);
     } catch (err) {
       throw new Error(`Erro ao logar usuário: ${err}`);
