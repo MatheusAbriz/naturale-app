@@ -6,7 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { getPosts } from "@/services/PostService";
 import { Posts } from "@/types/posts/PostTypes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,11 +20,6 @@ export default function Home() {
     gcTime: 15 * 60 * 1000 // 15 minutos
   });
   const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
-
-  useEffect(() => {
-    console.log("isOpen", !!selectedPost);
-    console.log("post", selectedPost);
-  }, [selectedPost]);
 
   return (
     <ProtectedRoute>
