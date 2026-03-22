@@ -7,7 +7,7 @@ export const FooterView = styled.View`
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1060;
+    z-index: 2;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;

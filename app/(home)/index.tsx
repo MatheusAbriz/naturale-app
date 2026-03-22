@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/skeleton";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { getPosts } from "@/services/PostService";
+import { useFooter } from "@/stores/hide-footer-store";
 import { Posts } from "@/types/posts/PostTypes";
 import { useState } from "react";
 import { FlatList } from "react-native";
@@ -12,7 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   // TODO: Ver possibilidade de caching mais avançado
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const showFooter = useFooter((state) => state.setFooter);
   const { data: posts, isFetching, isLoading, refetch } = useApi({
     queryFn: getPosts,
     queryKey: ["posts", user?.id],
@@ -21,6 +23,11 @@ export default function Home() {
     gcTime: 15 * 60 * 1000 // 15 minutos
   });
   const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
+
+  const handleCloseComments = () => {
+    showFooter(true);
+    setSelectedPost(null);
+  }
 
   return (
     <ProtectedRoute>
@@ -46,7 +53,7 @@ export default function Home() {
       <Comment
         post={selectedPost}
         isOpen={!!selectedPost}
-        onClose={() => setSelectedPost(null)}
+        onClose={handleCloseComments}
       />
     </ProtectedRoute>
   );

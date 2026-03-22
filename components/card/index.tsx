@@ -6,6 +6,7 @@ import { Text } from "@/components/ui/text";
 import { theme } from "@/globals/theme";
 import { useLoader } from "@/hooks/useLoader";
 import { insertFavorite, insertLike } from "@/services/PostService";
+import { useFooter } from "@/stores/hide-footer-store";
 import { Paginated } from "@/types/pagination/PaginationTypes";
 import { Posts } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
@@ -25,6 +26,7 @@ type CardProps = {
 
 export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments }: CardProps) {
     const { setLoading } = useLoader();
+    const showFooter = useFooter((state) => state.setFooter);
     const [expanded, setExpanded] = useState(false);
 
     async function toggleLike() {
@@ -59,6 +61,11 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
         }
     };
 
+    function handleOpenComments() {
+        showFooter(false);
+        onOpenComments(post!);
+    }
+
     return (
     <Card className="p-0 w-full mx-auto bg-[#F2F2F2] border-b border-gray-300">
         <Box className="flex-row items-center gap-3 py-3 px-3">
@@ -87,7 +94,7 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
                     <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
                 </Box>
                 <Box className="flex-row gap-2 items-center">
-                    <TouchableOpacity onPress={() => onOpenComments(post!)}>
+                    <TouchableOpacity onPress={handleOpenComments}>
                         <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
                     </TouchableOpacity>
                     <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>

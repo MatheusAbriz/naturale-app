@@ -9,10 +9,18 @@ import { AuthContextProvider } from "@/contexts/authContext";
 import "@/global.css";
 import { useAuth } from "@/hooks/useAuth";
 import { useLoader } from "@/hooks/useLoader";
+import { useFooter } from "@/stores/hide-footer-store";
 import { Toasts } from "@backpackapp-io/react-native-toast";
 import { Stack } from "expo-router";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false
+    },
+  },
+});
+
 export default function RootLayout() {
   return (
     <GluestackUIProvider mode="dark">
@@ -33,6 +41,7 @@ export default function RootLayout() {
 function RootContent() {
   const { loading } = useLoader();
   const { isAuthenticated } = useAuth();
+  const footer = useFooter((state) => state.footer);
 
   return (
     <>
@@ -40,7 +49,7 @@ function RootContent() {
       <Stack 
         screenOptions={{ headerShown: false }}
         />
-      {isAuthenticated && <Footer />}
+      {(isAuthenticated && footer) && <Footer />}
     </>
   );
 }
