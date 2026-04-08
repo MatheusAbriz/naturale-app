@@ -4,9 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { theme } from "@/globals/theme";
-import { useLoader } from "@/hooks/useLoader";
 import { insertFavorite, insertLike } from "@/services/PostService";
 import { useFooter } from "@/stores/hide-footer-store";
+import { useLoader } from "@/stores/loader-store";
 import { Paginated } from "@/types/pagination/PaginationTypes";
 import { Posts } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
@@ -20,7 +20,7 @@ import IonIcon from "react-native-vector-icons/Ionicons";
 
 type CardProps = {
     post: Posts;
-    onOpenComments: React.Dispatch<React.SetStateAction<Posts | null>>;
+    onOpenComments: (post: Posts) => void;
     onSuccess: (options?: RefetchOptions) => Promise<QueryObserverResult<Paginated<Posts[]>, Error>>;
 }
 

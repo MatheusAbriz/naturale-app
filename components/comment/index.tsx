@@ -1,7 +1,7 @@
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
-import { useLoader } from "@/hooks/useLoader";
 import { addComment, getComments } from "@/services/CommentService";
+import { useLoader } from "@/stores/loader-store";
 import { CommentDTO, CreateComment } from "@/types/comments";
 import { Posts } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
@@ -48,7 +48,6 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
 
     async function createComment() {
         try {
-            setLoading(true);
             const { comment } = getValues();
 
             if (!comment?.trim()) return;
@@ -67,25 +66,19 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
         } catch (e) {
             console.error(e);
             toast.error(e);
-        } finally {
-            setLoading(false);
         }
     }
 
     useEffect(() => {
         if (isOpen) bottomSheetRef.current?.expand();
         else bottomSheetRef.current?.close();
-
-        return () => {
-            bottomSheetRef.current?.close();
-        }
     }, [isOpen]);
 
     const handleSheetChanges = useCallback(
         (index: number) => {
-            if (index === -1) onClose();
+            if (index === -1 && isOpen) onClose();
         },
-        [onClose]
+        [onClose, isOpen]
     );
 
     return (

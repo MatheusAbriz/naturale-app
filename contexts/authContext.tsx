@@ -1,5 +1,5 @@
 import { setAuthToken } from "@/hooks/useApi";
-import { useLoader } from "@/hooks/useLoader";
+import { useLoader } from "@/stores/loader-store";
 import { AuthContextProviderProps, AuthContextType, User } from "@/types/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useEffect, useState } from "react";

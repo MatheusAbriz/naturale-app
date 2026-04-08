@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useLoader } from "@/hooks/useLoader";
+import { useLoader } from "@/stores/loader-store";
 import { Redirect } from "expo-router";
 import { ReactNode } from "react";
 import { Loader } from "../loader";
