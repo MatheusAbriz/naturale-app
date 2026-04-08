@@ -11,7 +11,7 @@ export function CommentItem({ comment, level = 0 }: CommentItemProps) {
     <View style={{ marginLeft: level * 12, marginTop: 12 }}>
       <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
         <Image
-          source={{ uri: comment.avatar }}
+          source={{ uri: comment.avatar ?? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" }}
           style={{
               width: 32,
               height: 32,

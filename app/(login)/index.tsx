@@ -31,7 +31,7 @@ export default function Login() {
             }
             
             await signIn(payload);
-            toast.success("Logado realizado com sucesso, seja bem-vindo!");
+            toast.success("Login realizado com sucesso, seja bem-vindo!");
             router.push("/(home)");
         } catch (e) {
             console.error(`Erro! ${e}`);

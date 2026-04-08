@@ -1,30 +1,37 @@
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
-import { getComments } from "@/services/CommentService";
+import { useLoader } from "@/hooks/useLoader";
+import { addComment, getComments } from "@/services/CommentService";
+import { CommentDTO, CreateComment } from "@/types/comments";
 import { Posts } from "@/types/posts/PostTypes";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import { toast } from "@backpackapp-io/react-native-toast";
+import BottomSheet, {
+    BottomSheetBackdrop,
+    BottomSheetFlatList,
+    BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import React, { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { FlatList, Text } from "react-native";
+import { Text } from "react-native";
 import { Input } from "../inputs/input";
 import { CommentItem } from "./comment-item";
-import { InputArea } from "./styles";
+import { CommentButton, InputArea } from "./styles";
 
 type CommentProps = {
-    post: Posts | null,
-    isOpen: boolean,
-    onClose: () => void
-}
+    post: Posts | null;
+    isOpen: boolean;
+    onClose: () => void;
+};
 
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
     const { user } = useAuth();
-    const { data: comments } = useApi({
+    const { setLoading } = useLoader();
+    const { data: comments, refetch } = useApi({
         queryKey: ["comments", post?.post_id, user?.id],
         queryFn: () => getComments(post?.post_id!),
-        enabled: !!post && !!user
+        enabled: !!post && !!user,
     });
-    const { control } = useForm();
-
+    const { control, getValues, resetField } = useForm();
     const bottomSheetRef = useRef<BottomSheet>(null);
 
     const renderBackdrop = useCallback(
@@ -33,56 +40,102 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
                 {...props}
                 disappearsOnIndex={-1}
                 appearsOnIndex={0}
-                pressBehavior="close" 
+                pressBehavior="close"
             />
         ),
         []
     );
 
+    async function createComment() {
+        try {
+            setLoading(true);
+            const { comment } = getValues();
+
+            if (!comment?.trim()) return;
+
+            const payload: CreateComment = {
+                user_id: user?.id as number,
+                post_id: post?.post_id as number,
+                comment_text: comment,
+            };
+
+            await addComment(payload);
+            resetField("comment");
+            toast.success("Comentário inserido com sucesso!");
+
+            await refetch();
+        } catch (e) {
+            console.error(e);
+            toast.error(e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     useEffect(() => {
         if (isOpen) bottomSheetRef.current?.expand();
         else bottomSheetRef.current?.close();
+
+        return () => {
+            bottomSheetRef.current?.close();
+        }
     }, [isOpen]);
 
-    const handleSheetChanges = useCallback((index: number) => {
-        if (index === -1) {
-            onClose();
-        }
-    }, [onClose]);
+    const handleSheetChanges = useCallback(
+        (index: number) => {
+            if (index === -1) onClose();
+        },
+        [onClose]
+    );
 
     return (
         <BottomSheet
-            style={{ zIndex: 3, flex: 1 }}
+            style={{ zIndex: 3 }}
             ref={bottomSheetRef}
-            index={-1} 
-            snapPoints={['40%', '50%']} 
-            enablePanDownToClose={true} 
+            index={-1}
+            snapPoints={["45%", "80%"]}
+            enablePanDownToClose={true}
             onChange={handleSheetChanges}
             backdropComponent={renderBackdrop}
-            backgroundStyle={{ backgroundColor: '#FFF' }} 
-            handleIndicatorStyle={{ backgroundColor: '#CCC', width: 40 }} 
+            backgroundStyle={{ backgroundColor: "#FFF" }}
+            handleIndicatorStyle={{ backgroundColor: "#CCC", width: 40 }}
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
         >
-            <BottomSheetView className="flex-1 px-5 pt-3">
-                <Text className="text-xl mb-2 text-typography-700 font-semibold">
+            <BottomSheetView>
+                <Text
+                    style={{
+                        fontSize: 16,
+                        fontWeight: "600",
+                        textAlign: "center",
+                        paddingVertical: 4,
+                        paddingHorizontal: 20,
+                        color: "#1a1a1a",
+                    }}
+                >
                     Comentários
                 </Text>
-
-                <FlatList
-                    data={comments?.msg as any ?? []}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => <CommentItem comment={item} />}
+            </BottomSheetView>
+                <BottomSheetFlatList
+                    style={{ flex: 1, paddingTop: 24 }}
+                    data={(comments?.msg as CommentDTO[]) ?? []}
+                    keyExtractor={(item: CommentDTO) => item.id.toString()}
+                    renderItem={({ item }: any) => <CommentItem comment={item} />}
                     showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 70 }}
                 />
 
                 <InputArea>
-                    <Input 
+                    <Input
                         placeholder="Escreva um comentário..."
                         name="comment"
                         control={control}
                         autoCapitalize="none"
+                        style={{ flex: 1 }}
                     />
+                    <CommentButton title="➤" onPress={createComment} />
                 </InputArea>
-            </BottomSheetView>
         </BottomSheet>
     );
 }

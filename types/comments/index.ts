@@ -8,3 +8,9 @@ export type CommentDTO = {
     avatar: string;
     replies: CommentDTO[];
 };
+
+export type CreateComment = {
+    post_id: number,
+    user_id: number,
+    comment_text: string
+};
