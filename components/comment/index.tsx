@@ -1,7 +1,5 @@
-import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/hooks/useAuth";
 import { addComment, getComments } from "@/services/CommentService";
-import { useLoader } from "@/stores/loader-store";
 import { CommentDTO, CreateComment } from "@/types/comments";
 import { Posts } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
@@ -10,6 +8,7 @@ import BottomSheet, {
     BottomSheetFlatList,
     BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Text } from "react-native";
@@ -25,14 +24,23 @@ type CommentProps = {
 
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
     const { user } = useAuth();
-    const { setLoading } = useLoader();
-    const { data: comments, refetch } = useApi({
+    //TODO: Implementar infinite loading aqui!
+    // const { data: comments, refetch } = useApi({
+    //     queryKey: ["comments", post?.post_id, user?.id],
+    //     queryFn: () => getComments(post?.post_id!),
+    //     enabled: !!post && !!user,
+    // });
+    const { data, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey: ["comments", post?.post_id, user?.id],
-        queryFn: () => getComments(post?.post_id!),
+        queryFn: ({ pageParam = 0 }) => getComments(post?.post_id!),
         enabled: !!post && !!user,
-    });
+        initialPageParam: 0,
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    })
     const { control, getValues, resetField } = useForm();
     const bottomSheetRef = useRef<BottomSheet>(null);
+    const comments = data?.pages.flatMap(page => page.data.msg) ?? [];
+    const queryClient = useQueryClient();
 
     const renderBackdrop = useCallback(
         (props: any) => (
@@ -62,7 +70,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
             resetField("comment");
             toast.success("Comentário inserido com sucesso!");
 
-            await refetch();
+            await queryClient.invalidateQueries({ queryKey: ["comments"] });
         } catch (e) {
             console.error(e);
             toast.error(e);
@@ -81,6 +89,8 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
         [onClose, isOpen]
     );
 
+    console.log(data)
+
     return (
         <BottomSheet
             style={{ zIndex: 3 }}
@@ -95,7 +105,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
             keyboardBehavior="interactive"
             keyboardBlurBehavior="restore"
         >
-            <BottomSheetView>
+            <BottomSheetView style={{ flex: 1 }}>
                 <Text
                     style={{
                         fontSize: 16,
@@ -111,10 +121,16 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
             </BottomSheetView>
                 <BottomSheetFlatList
                     style={{ flex: 1, paddingTop: 24 }}
-                    data={(comments?.msg as CommentDTO[]) ?? []}
+                    data={comments}
                     keyExtractor={(item: CommentDTO) => item.id.toString()}
                     renderItem={({ item }: any) => <CommentItem comment={item} />}
-                    showsVerticalScrollIndicator={false}
+                    onEndReached={() => {
+                        if (hasNextPage && !isFetchingNextPage) {
+                            fetchNextPage();
+                        }
+                    }}
+                    onEndReachedThreshold={0.5}
+                    showsVerticalScrollIndicator
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 70 }}
                 />
