@@ -1,9 +1,21 @@
 import { API } from "@/hooks/useApi";
-import { CreateComment } from "@/types/comments";
+import { CommentDTO, CreateComment } from "@/types/comments";
 
-export function getComments(postId: number | string, page: number = 0) {
-    //TODO: Tipar corretamente
-    return API.get<any>(`/comments/post/${postId}/${page}`);
+export type CommentsResponse = {
+    status: boolean;
+    msg: CommentDTO[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
+
+export function getComments(postId: number | string, page: number = 1) {
+    return API.get<CommentsResponse>(`/comments/post/${postId}`, {
+        params: { page, limit: 10 }
+    });
 }
 
 export function addComment(comment: CreateComment) {

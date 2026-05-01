@@ -24,19 +24,17 @@ type CommentProps = {
 
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
     const { user } = useAuth();
-    //TODO: Implementar infinite loading aqui!
-    // const { data: comments, refetch } = useApi({
-    //     queryKey: ["comments", post?.post_id, user?.id],
-    //     queryFn: () => getComments(post?.post_id!),
-    //     enabled: !!post && !!user,
-    // });
-    const { data, refetch, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey: ["comments", post?.post_id, user?.id],
-        queryFn: ({ pageParam = 0 }) => getComments(post?.post_id!),
+        queryFn: ({ pageParam = 1 }) => getComments(post?.post_id!, pageParam),
         enabled: !!post && !!user,
-        initialPageParam: 0,
-        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    })
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => {
+            const { page, totalPages } = lastPage.data.pagination;
+            return page < totalPages ? page + 1 : undefined;
+        },
+    });
+
     const { control, getValues, resetField } = useForm();
     const bottomSheetRef = useRef<BottomSheet>(null);
     const comments = data?.pages.flatMap(page => page.data.msg) ?? [];
@@ -119,32 +117,32 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
                     Comentários
                 </Text>
             </BottomSheetView>
-                <BottomSheetFlatList
-                    style={{ flex: 1, paddingTop: 24 }}
-                    data={comments}
-                    keyExtractor={(item: CommentDTO) => item.id.toString()}
-                    renderItem={({ item }: any) => <CommentItem comment={item} />}
-                    onEndReached={() => {
-                        if (hasNextPage && !isFetchingNextPage) {
-                            fetchNextPage();
-                        }
-                    }}
-                    onEndReachedThreshold={0.5}
-                    showsVerticalScrollIndicator
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 70 }}
-                />
+            <BottomSheetFlatList
+                style={{ flex: 1, paddingTop: 24 }}
+                data={comments}
+                keyExtractor={(item: CommentDTO) => item.id.toString()}
+                renderItem={({ item }: any) => <CommentItem comment={item} />}
+                onEndReached={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                        fetchNextPage();
+                    }
+                }}
+                onEndReachedThreshold={0.5}
+                showsVerticalScrollIndicator
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 70 }}
+            />
 
-                <InputArea>
-                    <Input
-                        placeholder="Escreva um comentário..."
-                        name="comment"
-                        control={control}
-                        autoCapitalize="none"
-                        style={{ flex: 1 }}
-                    />
-                    <CommentButton title="➤" onPress={createComment} />
-                </InputArea>
+            <InputArea>
+                <Input
+                    placeholder="Escreva um comentário..."
+                    name="comment"
+                    control={control}
+                    autoCapitalize="none"
+                    style={{ flex: 1 }}
+                />
+                <CommentButton title="➤" onPress={createComment} />
+            </InputArea>
         </BottomSheet>
     );
 }
