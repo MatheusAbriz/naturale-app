@@ -6,6 +6,10 @@ export function getPosts() {
     return API.get<Paginated<Posts[]>>("/posts");
 }
 
+export function getFavoritesPosts(userId: number) {
+    return API.get<Paginated<Posts[]>>(`/favorites/${userId}`)
+}
+
 export function insertLike(postId: number | string, userId: number | string) {
     return API.patch(`/posts/${postId}/like/${userId}`);
 }
