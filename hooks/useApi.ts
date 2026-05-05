@@ -29,14 +29,9 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const message =
-      error.response?.data?.message || "Erro na requisição";
-
     if (error.response?.status === 403) {
       useAuth.getState().logout();
       toast("Sessão expirada, faça login novamente!");
-    } else {
-      toast(message);
     }
 
     return Promise.reject(error);
