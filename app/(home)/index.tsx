@@ -3,8 +3,8 @@ import Comment from "@/components/comment";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
 import { useApi } from "@/hooks/useApi";
-import { useAuth } from "@/hooks/useAuth";
 import { getPosts } from "@/services/PostService";
+import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 import { Posts } from "@/types/posts/PostTypes";
 import { useCallback, useState } from "react";
@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   // TODO: Ver possibilidade de caching mais avançado
-  const { user } = useAuth();
+  const { user } = useAuth.getState();
   const showFooter = useFooter((state) => state.setFooter);
   const { data: posts, isFetching, isLoading, refetch } = useApi({
     queryFn: getPosts,
@@ -23,7 +23,7 @@ export default function Home() {
     gcTime: 15 * 60 * 1000 // 15 minutos
   });
   const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
-  
+
   const handleOpenComments = useCallback((post: Posts) => {
     showFooter(false);
     setSelectedPost(post);
@@ -37,18 +37,18 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <SafeAreaView style={{ flex: 1 }}>
-        <FlatList 
+        <FlatList
           style={{ width: "100%" }}
           contentContainerStyle={{ paddingBottom: 60 }}
           data={isLoading ? Array(6).fill({}) : posts?.data ?? []}
-          keyExtractor={(item, index) => 
+          keyExtractor={(item, index) =>
             isLoading ? index?.toString() : item?.post_id?.toString()
           }
-          renderItem={({ item }) => 
+          renderItem={({ item }) =>
             isLoading ? (
               <Skeleton />
             ) : (
-              <PostCard post={item} onSuccess={refetch} onOpenComments={handleOpenComments}/>
+              <PostCard post={item} onSuccess={refetch} onOpenComments={handleOpenComments} />
             )
           }
           refreshing={isFetching}

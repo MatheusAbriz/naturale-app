@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/stores/auth-store";
 import { addComment, getComments } from "@/services/CommentService";
 import { CommentDTO, CreateComment } from "@/types/comments";
 import { Posts } from "@/types/posts/PostTypes";
@@ -23,7 +23,7 @@ type CommentProps = {
 };
 
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
-    const { user } = useAuth();
+    const { user } = useAuth.getState();
     const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey: ["comments", post?.post_id, user?.id],
         queryFn: ({ pageParam = 1 }) => getComments(post?.post_id!, pageParam),
@@ -87,7 +87,6 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
         [onClose, isOpen]
     );
 
-    console.log(data)
 
     return (
         <BottomSheet

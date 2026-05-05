@@ -4,13 +4,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Footer } from "@/components/footer";
 import { Loader } from "@/components/loader";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { AuthContextProvider } from "@/contexts/authContext";
 import "@/global.css";
-import { useAuth } from "@/hooks/useAuth";
 import { useFooter } from "@/stores/hide-footer-store";
 import { useLoader } from "@/stores/loader-store";
 import { Toasts } from "@backpackapp-io/react-native-toast";
 import { Stack } from "expo-router";
+import { useAuth } from "@/stores/auth-store";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,12 +23,10 @@ export default function RootLayout() {
   return (
     <GluestackUIProvider mode="dark">
       <QueryClientProvider client={queryClient}>
-        <AuthContextProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <RootContent />
-            <Toasts />
-          </GestureHandlerRootView>
-        </AuthContextProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <RootContent />
+          <Toasts />
+        </GestureHandlerRootView>
       </QueryClientProvider>
     </GluestackUIProvider>
   );
@@ -37,15 +34,15 @@ export default function RootLayout() {
 
 function RootContent() {
   const loading = useLoader((state) => state.loading);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth.getState();
   const footer = useFooter((state) => state.footer);
 
   return (
     <>
       {loading && <Loader />}
-      <Stack 
+      <Stack
         screenOptions={{ headerShown: false }}
-        />
+      />
       {(isAuthenticated && footer) && <Footer />}
     </>
   );

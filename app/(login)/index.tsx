@@ -2,7 +2,6 @@ import BackgroundLogin from "@/assets/images/login-background.png";
 import Logo from "@/assets/images/white-logo.svg";
 import { Input } from "@/components/inputs/input";
 import { theme } from "@/globals/theme";
-import { useAuth } from "@/hooks/useAuth";
 import { login } from "@/services/AuthService";
 import { useLoader } from "@/stores/loader-store";
 import { User } from "@/types/auth";
@@ -11,25 +10,26 @@ import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import Icon from "react-native-vector-icons/AntDesign";
 import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, SubText, Text } from "./styles";
+import { useAuth } from "@/stores/auth-store";
 
 export default function Login() {
     const { control, getValues } = useForm();
     const { loading, setLoading } = useLoader();
-    const { signIn } = useAuth();
+    const { signIn } = useAuth.getState();
     const router = useRouter();
 
     async function submit() {
         try {
             setLoading(true);
             const { email, password } = getValues();
-            if(!email || !password) return toast.error("Preencha os campos corretamente!");
-            
+            if (!email || !password) return toast.error("Preencha os campos corretamente!");
+
             const res = await login({ email, password });
             const payload: User = {
                 ...res?.data,
                 role: res?.data?.type
             }
-            
+
             await signIn(payload);
             toast.success("Login realizado com sucesso, seja bem-vindo!");
             router.push("/(home)");
