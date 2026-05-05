@@ -41,8 +41,8 @@ export default function Home() {
           style={{ width: "100%" }}
           contentContainerStyle={{ paddingBottom: 60 }}
           data={isLoading ? Array(6).fill({}) : posts?.data ?? []}
-          keyExtractor={(item, index) =>
-            isLoading ? index?.toString() : item?.post_id?.toString()
+          keyExtractor={(item: Posts, index) =>
+            isLoading ? index?.toString() : item?.postId?.toString()
           }
           renderItem={({ item }) =>
             isLoading ? (

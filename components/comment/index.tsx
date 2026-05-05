@@ -25,8 +25,8 @@ type CommentProps = {
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
     const { user } = useAuth.getState();
     const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
-        queryKey: ["comments", post?.post_id, user?.id],
-        queryFn: ({ pageParam = 1 }) => getComments(post?.post_id!, pageParam),
+        queryKey: ["comments", post?.postId, user?.id],
+        queryFn: ({ pageParam = 1 }) => getComments(post?.postId!, pageParam),
         enabled: !!post && !!user,
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
@@ -60,7 +60,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
 
             const payload: CreateComment = {
                 user_id: user?.id as number,
-                post_id: post?.post_id as number,
+                post_id: post?.postId as number,
                 comment_text: comment,
             };
 
