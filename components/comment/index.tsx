@@ -11,7 +11,7 @@ import BottomSheet, {
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Text } from "react-native";
+import { FlatList, Text } from "react-native";
 import { Input } from "../inputs/input";
 import { CommentItem } from "./comment-item";
 import { CommentButton, InputArea } from "./styles";
@@ -76,7 +76,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
     }
 
     useEffect(() => {
-        if (isOpen) bottomSheetRef.current?.expand();
+        if (isOpen) bottomSheetRef.current?.snapToIndex(0); // ← era .expand()
         else bottomSheetRef.current?.close();
     }, [isOpen]);
 
@@ -90,17 +90,19 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
 
     return (
         <BottomSheet
-            style={{ zIndex: 3 }}
             ref={bottomSheetRef}
             index={-1}
             snapPoints={["45%", "80%"]}
-            enablePanDownToClose={true}
+            enableDynamicSizing={false}
+            enablePanDownToClose
             onChange={handleSheetChanges}
             backdropComponent={renderBackdrop}
             backgroundStyle={{ backgroundColor: "#FFF" }}
             handleIndicatorStyle={{ backgroundColor: "#CCC", width: 40 }}
-            keyboardBehavior="interactive"
-            keyboardBlurBehavior="restore"
+            keyboardBehavior="extend"       // ← era "interactive"
+            keyboardBlurBehavior="restore"  // ← mantém, restaura ao fechar teclado
+            android_keyboardInputMode="adjustResize"  // ← adicione isso
+            style={{ zIndex: 3 }}
         >
             <BottomSheetView style={{ flex: 1 }}>
                 <Text
@@ -116,7 +118,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
                     Comentários
                 </Text>
             </BottomSheetView>
-            <BottomSheetFlatList
+            <FlatList
                 style={{ flex: 1, paddingTop: 24 }}
                 data={comments}
                 keyExtractor={(item: CommentDTO) => item.id.toString()}
@@ -129,10 +131,10 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
                 onEndReachedThreshold={0.5}
                 showsVerticalScrollIndicator
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 70 }}
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
             />
 
-            <InputArea>
+            <InputArea edges={["bottom"]}>
                 <Input
                     placeholder="Escreva um comentário..."
                     name="comment"

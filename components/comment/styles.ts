@@ -11,11 +11,6 @@ export const InputArea = styled(SafeAreaView)`
     border-top-width: 1px;
     border-top-color: #E5E5E5;
     background-color: #FFF;
-
-    position: absolute;
-    bottom: 80px;
-    left: 0;
-    right: 0;
 `;
 
 export const CommentButton = styled(Button)`

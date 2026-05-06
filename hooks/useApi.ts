@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Constants from "expo-constants";
 import { toast } from "@backpackapp-io/react-native-toast";
 import { useAuth } from "@/stores/auth-store";
+import { useFooter } from "@/stores/hide-footer-store";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL;
 
@@ -30,6 +31,8 @@ API.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 403) {
+      const { setFooter } = useFooter.getState();
+      setFooter(false);
       useAuth.getState().logout();
       toast("Sessão expirada, faça login novamente!");
     }
