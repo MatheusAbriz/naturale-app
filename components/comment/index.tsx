@@ -76,7 +76,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
     }
 
     useEffect(() => {
-        if (isOpen) bottomSheetRef.current?.snapToIndex(0); // ← era .expand()
+        if (isOpen) bottomSheetRef.current?.snapToIndex(0);
         else bottomSheetRef.current?.close();
     }, [isOpen]);
 
@@ -99,9 +99,9 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
             backdropComponent={renderBackdrop}
             backgroundStyle={{ backgroundColor: "#FFF" }}
             handleIndicatorStyle={{ backgroundColor: "#CCC", width: 40 }}
-            keyboardBehavior="extend"       // ← era "interactive"
-            keyboardBlurBehavior="restore"  // ← mantém, restaura ao fechar teclado
-            android_keyboardInputMode="adjustResize"  // ← adicione isso
+            keyboardBehavior="extend"
+            keyboardBlurBehavior="restore"
+            android_keyboardInputMode="adjustResize"
             style={{ zIndex: 3 }}
         >
             <BottomSheetView style={{ flex: 1 }}>

@@ -10,7 +10,7 @@ export function getFavoritesPosts(userId: number) {
     return API.get<Paginated<Posts[]>>(`/favorites/${userId}`)
 }
 
-export function insertLike(postId: number | string, userId: number | string) {
+export function insertLike(userId: number | string, postId: number | string) {
     return API.patch(`/posts/${postId}/like/${userId}`);
 }
 

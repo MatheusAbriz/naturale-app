@@ -37,11 +37,11 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
             setLoading(true);
             const postId = post?.postId
             const userId = user?.id!
-            await insertLike(postId!, userId);
+            await insertLike(userId, postId!);
             onSuccess();
         } catch (e) {
             console.error(e);
-            toast.error("Erro! Tente novamente mais tarde");
+            toast.error(`Erro! ${e}`);
         }
         finally {
             setLoading(false);
