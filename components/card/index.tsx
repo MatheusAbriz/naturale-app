@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { theme } from "@/globals/theme";
-import { insertFavorite, insertLike } from "@/services/PostService";
+import { getPosts, insertFavorite, insertLike } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 import { useLoader } from "@/stores/loader-store";
@@ -19,6 +19,7 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 import Icon from "react-native-vector-icons/Ionicons";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import IonIcon from "react-native-vector-icons/Ionicons";
+import { useDeleteLike } from "@/hooks/useDeleteLike";
 
 type CardProps = {
     post: Posts;
@@ -28,29 +29,22 @@ type CardProps = {
 
 export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments }: CardProps) {
     const { user } = useAuth.getState();
-    const { setLoading } = useLoader();
     const showFooter = useFooter((state) => state.setFooter);
     const [expanded, setExpanded] = useState(false);
+    const { mutate, isPending } = useDeleteLike();
 
     async function toggleLike() {
         try {
-            setLoading(true);
-            const postId = post?.postId
-            const userId = user?.id!
-            await insertLike(userId, postId!);
-            onSuccess();
+            mutate(post?.postId);
         } catch (e) {
             console.error(e);
             toast.error(`Erro! ${e}`);
-        }
-        finally {
-            setLoading(false);
         }
     };
 
     async function toggleFavorite() {
         try {
-            setLoading(true);
+            // setLoading(true);
             const postId = post?.postId;
             const userId = user?.id;
 
@@ -60,7 +54,7 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
             console.error(e);
             toast.error("Erro! Tente novamente mais tarde");
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 
@@ -91,7 +85,7 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
             <Box className="flex-row items-center justify-between gap-3 px-3">
                 <Box className="flex-row gap-4 items-center">
                     <Box className="flex-row gap-2 items-center">
-                        <TouchableOpacity onPress={toggleLike}>
+                        <TouchableOpacity disabled={isPending} onPress={toggleLike}>
                             <Icon name={post?.isLiked ? "heart" : "heart-outline"} size={20} color={post?.isLiked ? theme.colors.lightGreen : theme.colors.black} />
                         </TouchableOpacity>
                         <Text style={{ color: theme.colors.lightBlack }}>{post?.likes_count}</Text>
