@@ -1,5 +1,6 @@
 import { PostCard } from "@/components/card";
 import Comment from "@/components/comment";
+import { EmptyList } from "@/components/notFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
 import { useApi } from "@/hooks/useApi";
@@ -39,6 +40,7 @@ export default function Favorites() {
             <SafeAreaView style={{ flex: 1 }}>
                 <FlatList
                     style={{ width: "100%" }}
+                    ListEmptyComponent={<EmptyList />}
                     contentContainerStyle={{ paddingBottom: 60 }}
                     data={isLoading ? Array(6).fill({}) : posts?.data ?? []}
                     keyExtractor={(item: Posts, index) =>

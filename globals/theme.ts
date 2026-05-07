@@ -11,6 +11,11 @@ export const theme = {
         buttonBackground: "#D9D9D9",
         lightGray: "#D3D3D3",
         heavyGray: "#CCC",
+
+        states: {
+            activeGreen: "#2E7D6B",
+            activeBackground: "#A7D0C5",
+        }
     },
     paddings: {
         s: "4px",

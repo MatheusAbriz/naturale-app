@@ -1,6 +1,6 @@
 import { NormalText } from "@/globals/texts";
 import { theme } from "@/globals/theme";
-import { styled } from "styled-components/native";
+import { css, styled } from "styled-components/native";
 
 export const FooterView = styled.View`
     position: absolute;
@@ -16,23 +16,20 @@ export const FooterView = styled.View`
     height: 60px;
 `;
 
-export const IconContainer = styled.View<{ isActive: boolean }>`
+export const IconContainer = styled.View`
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column-reverse;
     border-radius: ${theme.paddings.m};
     padding: ${theme.paddings.s} ${theme.paddings.l};
-
-    ${({ isActive }) => isActive && `
-        background-color: rgba(81, 140, 129, .4);
-    `}
 `;
 
 export const TextIcon = styled(NormalText)<{ isActive: boolean }>`
     color: ${theme.colors.lightBlack};
 
-    ${({ isActive }) => isActive && `
-        color: ${theme.colors.white};
+    ${({ isActive }) => isActive && css`
+        color: ${theme.colors.states.activeGreen};
+        font-weight: bold;
     `}
 `;
