@@ -4,10 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { theme } from "@/globals/theme";
-import { getPosts, insertFavorite, insertLike } from "@/services/PostService";
-import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
-import { useLoader } from "@/stores/loader-store";
 import { Paginated } from "@/types/pagination/PaginationTypes";
 import { Posts } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
@@ -15,11 +12,11 @@ import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { memo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
-import FeatherIcon from "react-native-vector-icons/Feather";
 import Icon from "react-native-vector-icons/Ionicons";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import { useDeleteLike } from "@/hooks/useDeleteLike";
+import { useFavoritePost } from "@/hooks/useFavoritePost";
 
 type CardProps = {
     post: Posts;
@@ -28,10 +25,10 @@ type CardProps = {
 }
 
 export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments }: CardProps) {
-    const { user } = useAuth.getState();
     const showFooter = useFooter((state) => state.setFooter);
     const [expanded, setExpanded] = useState(false);
     const { mutate, isPending } = useDeleteLike();
+    const { mutate: mutateFavorite, isPending: isFavoritedPending } = useFavoritePost();
 
     async function toggleLike() {
         try {
@@ -44,17 +41,10 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
 
     async function toggleFavorite() {
         try {
-            // setLoading(true);
-            const postId = post?.postId;
-            const userId = user?.id;
-
-            await insertFavorite(userId!, postId!);
-            onSuccess()
+            mutateFavorite(post?.postId);
         } catch (e) {
             console.error(e);
             toast.error("Erro! Tente novamente mais tarde");
-        } finally {
-            // setLoading(false);
         }
     };
 
@@ -98,7 +88,7 @@ export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments
                     </Box>
                 </Box>
                 <Box className="flex-row items-center">
-                    <TouchableOpacity onPress={toggleFavorite}>
+                    <TouchableOpacity disabled={isFavoritedPending} onPress={toggleFavorite}>
                         <Icon name={post?.isFavorited ? "bookmark" : "bookmark-outline"} size={20} color={post?.isFavorited ? theme.colors.lightGreen : theme.colors.black} />
                     </TouchableOpacity>
                 </Box>

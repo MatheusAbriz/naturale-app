@@ -1,3 +1,4 @@
+import type { AxiosResponse } from "axios";
 import { UserSimpleDetails } from "../auth"
 
 export type Posts = {
@@ -14,3 +15,13 @@ export type Posts = {
     status: boolean,
     user: UserSimpleDetails
 }
+
+export type PostsCache = AxiosResponse<{
+    data: Posts[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}>;

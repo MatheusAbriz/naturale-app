@@ -1,15 +1,15 @@
-import { insertLike } from "@/services/PostService";
+import { insertFavorite } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import type { Posts, PostsCache } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 
-export function useDeleteLike() {
+export function useFavoritePost() {
     const queryClient = useQueryClient();
     const user = useAuth((state) => state.user);
 
-    const updatePosts = (postId: number) => (oldData: PostsCache | undefined): PostsCache | undefined => {
+    const updateHomePosts = (postId: number) => (oldData: PostsCache | undefined): PostsCache | undefined => {
         if (!oldData?.data?.data) return oldData;
 
         return {
@@ -18,20 +18,41 @@ export function useDeleteLike() {
                 ...oldData.data,
                 data: oldData.data.data.map((post) => {
                     if (post.postId !== postId) return post;
-
-                    const isLiked = !post.isLiked;
-                    return {
-                        ...post,
-                        isLiked,
-                        likes_count: isLiked ? post.likes_count + 1 : post.likes_count - 1,
-                    };
+                    return { ...post, isFavorited: !post.isFavorited };
                 }),
             },
         };
     };
 
+    const updateFavoritePosts = (postId: number) => (oldData: PostsCache | undefined): PostsCache | undefined => {
+        if (!oldData?.data?.data) return oldData;
+
+        const list = oldData.data.data;
+        const alreadyFavorited = list.some((post) => post.postId === postId);
+
+        let updated: Posts[];
+
+        if (alreadyFavorited) {
+            updated = list.filter((post) => post.postId !== postId);
+        } else {
+            const homePosts = queryClient.getQueryData<PostsCache>(["posts", user?.id]);
+            const postToAdd = homePosts?.data?.data.find((post) => post.postId === postId);
+
+            if (!postToAdd) return oldData;
+            updated = [{ ...postToAdd, isFavorited: true }, ...list];
+        }
+
+        return {
+            ...oldData,
+            data: {
+                ...oldData.data,
+                data: updated,
+            },
+        };
+    };
+
     return useMutation({
-        mutationFn: (postId: number) => insertLike(user?.id!, postId),
+        mutationFn: (postId: number) => insertFavorite(user?.id!, postId),
 
         onMutate: async (postId) => {
             if (!user?.id) return;
@@ -42,8 +63,8 @@ export function useDeleteLike() {
             const prevPosts = queryClient.getQueryData<PostsCache>(["posts", user.id]);
             const prevFavorites = queryClient.getQueryData<PostsCache>(["favorite-posts", user.id]);
 
-            queryClient.setQueryData<PostsCache>(["posts", user.id], updatePosts(postId));
-            queryClient.setQueryData<PostsCache>(["favorite-posts", user.id], updatePosts(postId));
+            queryClient.setQueryData<PostsCache>(["posts", user.id], updateHomePosts(postId));
+            queryClient.setQueryData<PostsCache>(["favorite-posts", user.id], updateFavoritePosts(postId));
 
             return { prevPosts, prevFavorites };
         },
