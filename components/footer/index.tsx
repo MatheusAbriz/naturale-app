@@ -56,7 +56,7 @@ export function Footer() {
         </IconContainer>
       </Pressable>
 
-      <Pressable onPress={() => console.log("Oiii")}>
+      <Pressable onPress={() => router.push("/chatbot")}>
         <IconContainer>
           <TextIcon isActive={isChatActive}>Chatbot</TextIcon>
           {isChatActive ? (
