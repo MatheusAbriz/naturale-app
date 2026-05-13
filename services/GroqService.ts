@@ -1,5 +1,4 @@
 import axios from "axios";
-import Constants from "expo-constants";
 
 const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
 

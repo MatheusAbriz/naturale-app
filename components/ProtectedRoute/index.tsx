@@ -10,7 +10,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth.getState();
 
   if (loading) return <Loader />;
-  if (!isAuthenticated) return <Redirect href="/(login)" />;
+  if (!isAuthenticated) return <Redirect href="/login" />;
 
   return <>{children}</>;
 }
