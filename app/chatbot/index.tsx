@@ -112,12 +112,13 @@ export default function Chatbot() {
         try {
             const reply = await callGroq(data.message);
             addMessage({ role: "bot", content: reply });
-        } catch {
+        } catch (err) {
             toast.error("Erro interno com o servidor. Tente novamente mais tarde.");
             addMessage({
                 role: "bot",
                 content: "Desculpe, não consegui processar sua solicitação. Tente novamente.",
             });
+            console.log(err)
         } finally {
             setLoading(false);
         }

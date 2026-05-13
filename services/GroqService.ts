@@ -1,7 +1,7 @@
 import axios from "axios";
 import Constants from "expo-constants";
 
-const GROQ_API_KEY = Constants.expoConfig?.extra?.GROQ_API_KEY;
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
 
 export const callGroq = async (userInput: string): Promise<string> => {
     const res = await axios.post(
