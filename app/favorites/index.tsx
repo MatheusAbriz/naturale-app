@@ -68,7 +68,6 @@ export default function Favorites() {
                         ) : (
                             <PostCard
                                 post={item}
-                                onSuccess={refetch}
                                 onOpenComments={handleOpenComments}
                             />
                         )
