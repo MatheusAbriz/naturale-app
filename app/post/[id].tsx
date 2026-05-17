@@ -109,7 +109,7 @@ export default function PostDetail() {
 
     return (
         <ProtectedRoute>
-            <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.white }} edges={["bottom"]}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.white, paddingBottom: 40 }} edges={["bottom"]}>
 
                 <BackButton onPress={() => router.back()}>
                     <IonIcon name="arrow-back" size={20} color={theme.colors.white} />
