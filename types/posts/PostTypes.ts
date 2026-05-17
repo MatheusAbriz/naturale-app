@@ -26,6 +26,10 @@ export type PostsCache = AxiosResponse<{
     };
 }>;
 
+export type PostDetailCache = AxiosResponse<{
+    data: Posts;
+}>;
+
 export type CreatePostDTO = {
     userId: number | string,
     title: string,

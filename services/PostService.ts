@@ -6,6 +6,10 @@ export function getPosts() {
     return API.get<Paginated<Posts[]>>("/posts");
 }
 
+export function getPostById(postId: number, userId: number) {
+    return API.get<Posts>(`/posts/${postId}/${userId}`);
+}
+
 export function getFavoritesPosts(userId: number) {
     return API.get<Paginated<Posts[]>>(`/favorites/${userId}`)
 }
