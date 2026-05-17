@@ -50,7 +50,7 @@ export default function Favorites() {
                         isLoading ? (
                             <Skeleton />
                         ) : (
-                            <PostCard post={item} onSuccess={refetch} onOpenComments={handleOpenComments} />
+                            <PostCard post={item} onOpenComments={handleOpenComments} />
                         )
                     }
                     refreshing={isFetching}

@@ -2,7 +2,7 @@ import { API } from "@/hooks/useApi";
 import { Paginated } from "@/types/pagination/PaginationTypes";
 import { Posts, type CreatePostDTO } from "@/types/posts/PostTypes";
 
-export function getPosts() {
+export function getPosts(page = 1) {
     return API.get<Paginated<Posts[]>>("/posts");
 }
 

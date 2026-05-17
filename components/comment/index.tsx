@@ -11,10 +11,13 @@ import BottomSheet, {
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { FlatList, Text } from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { Input } from "../inputs/input";
 import { CommentItem } from "./comment-item";
 import { CommentButton, InputArea } from "./styles";
+import { EmptyList } from "../notFound";
+import { Skeleton } from "../skeleton";
+import { theme } from "@/globals/theme";
 
 type CommentProps = {
     post: Posts | null;
@@ -24,7 +27,7 @@ type CommentProps = {
 
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
     const { user } = useAuth.getState();
-    const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey: ["comments", post?.postId, user?.id],
         queryFn: ({ pageParam = 1 }) => getComments(post?.postId!, pageParam),
         enabled: !!post && !!user,
@@ -120,9 +123,17 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
             </BottomSheetView>
             <FlatList
                 style={{ flex: 1, paddingTop: 24 }}
-                data={comments}
-                keyExtractor={(item: CommentDTO) => item.id.toString()}
-                renderItem={({ item }: any) => <CommentItem comment={item} />}
+                data={isLoading ? Array(6).fill({}) : comments ?? []}
+                keyExtractor={(_, index) => String(index)}
+                renderItem={({ item }: any) =>
+                    isLoading ? (
+                        <Skeleton />
+                    ) : (
+                        <CommentItem comment={item} />
+                    )
+
+                }
+                refreshing={isLoading && !isFetchingNextPage}
                 onEndReached={() => {
                     if (hasNextPage && !isFetchingNextPage) {
                         fetchNextPage();
@@ -132,6 +143,14 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
                 showsVerticalScrollIndicator
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
+                ListEmptyComponent={<EmptyList />}
+                ListFooterComponent={
+                    isFetchingNextPage ? (
+                        <View style={{ paddingVertical: 16 }}>
+                            <ActivityIndicator color={theme.colors.lightGreen} />
+                        </View>
+                    ) : null
+                }
             />
 
             <InputArea edges={["bottom"]}>

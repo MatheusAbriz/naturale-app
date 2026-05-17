@@ -22,10 +22,9 @@ import { useRouter } from "expo-router";
 type CardProps = {
     post: Posts;
     onOpenComments: (post: Posts) => void;
-    onSuccess: (options?: RefetchOptions) => Promise<QueryObserverResult<Paginated<Posts[]>, Error>>;
 }
 
-export const PostCard = memo(function PostCard({ post, onSuccess, onOpenComments }: CardProps) {
+export const PostCard = memo(function PostCard({ post, onOpenComments }: CardProps) {
     const showFooter = useFooter((state) => state.setFooter);
     const router = useRouter();
     const [expanded, setExpanded] = useState(false);

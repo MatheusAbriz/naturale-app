@@ -3,26 +3,43 @@ import Comment from "@/components/comment";
 import { EmptyList } from "@/components/notFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
+import { theme } from "@/globals/theme";
 import { useApi } from "@/hooks/useApi";
 import { getPosts } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 import { Posts } from "@/types/posts/PostTypes";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
-import { FlatList } from "react-native";
+import { ActivityIndicator, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   // TODO: Ver possibilidade de caching mais avançado
   const user = useAuth((state) => state.user);
   const showFooter = useFooter((state) => state.setFooter);
-  const { data: posts, isFetching, isLoading, refetch } = useApi({
-    queryFn: getPosts,
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
     queryKey: ["posts", user?.id],
+    queryFn: ({ pageParam = 1 }) => getPosts(pageParam),
     enabled: !!user,
-    staleTime: 60 * 1000, // 1 minuto
-    gcTime: 15 * 60 * 1000 // 15 minutos
+    initialPageParam: 1,
+    staleTime: 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
   });
+
+  const posts = data?.pages.flatMap((page) => page.data.data) ?? [];
   const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
 
   const handleOpenComments = useCallback((post: Posts) => {
@@ -42,7 +59,7 @@ export default function Home() {
           style={{ width: "100%" }}
           ListEmptyComponent={<EmptyList />}
           contentContainerStyle={{ paddingBottom: 60 }}
-          data={isLoading ? Array(6).fill({}) : posts?.data ?? []}
+          data={isLoading ? Array(6).fill({}) : posts ?? []}
           keyExtractor={(item: Posts, index) =>
             isLoading ? index?.toString() : item?.postId?.toString()
           }
@@ -50,11 +67,22 @@ export default function Home() {
             isLoading ? (
               <Skeleton />
             ) : (
-              <PostCard post={item} onSuccess={refetch} onOpenComments={handleOpenComments} />
+              <PostCard post={item} onOpenComments={handleOpenComments} />
             )
           }
-          refreshing={isFetching}
+          refreshing={isFetching && !isFetchingNextPage}
           onRefresh={refetch}
+          onEndReached={() => {
+            if (hasNextPage && !isFetchingNextPage) fetchNextPage()
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View style={{ paddingVertical: 16 }}>
+                <ActivityIndicator color={theme.colors.lightGreen} />
+              </View>
+            ) : null
+          }
         />
       </SafeAreaView>
       <Comment
