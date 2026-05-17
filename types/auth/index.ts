@@ -17,6 +17,17 @@ export type UserSimpleDetails = {
   type: UserRoles
 }
 
+export type UserDTO = {
+  name: string,
+  username?: string,
+  phone: string,
+  cpf: string,
+  email: string,
+  password: string,
+  type: string,
+  avatar: string
+}
+
 export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;

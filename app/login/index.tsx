@@ -9,8 +9,9 @@ import { toast } from "@backpackapp-io/react-native-toast";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import Icon from "react-native-vector-icons/AntDesign";
-import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, SubText, Text } from "./styles";
+import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, StyledPressable, SubText, Text } from "./styles";
 import { useAuth } from "@/stores/auth-store";
+import { Pressable } from "react-native";
 
 export default function Login() {
     const { control, getValues } = useForm();
@@ -83,12 +84,11 @@ export default function Login() {
                         onPress={submit}
                         disabled={loading}
                     />
-
-                    <Text>Esqueceu sua senha?</Text>
                     <Divider />
 
                     <SubText>
-                        Não tem uma conta? <Span>Cadastre-se</Span>
+                        Não tem uma conta?
+                        <Span onPress={() => router.push("/register")}> Cadastre-se</Span>
                     </SubText>
                 </FormArea>
             </ImageBackground>
