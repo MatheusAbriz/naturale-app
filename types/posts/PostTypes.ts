@@ -25,3 +25,13 @@ export type PostsCache = AxiosResponse<{
         totalPages: number;
     };
 }>;
+
+export type CreatePostDTO = {
+    userId: number | string,
+    title: string,
+    text: string,
+    ingredients: string,
+    image: string,
+    time: string,
+    status: boolean
+}

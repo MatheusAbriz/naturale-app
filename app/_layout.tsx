@@ -8,8 +8,9 @@ import "@/global.css";
 import { useFooter } from "@/stores/hide-footer-store";
 import { useLoader } from "@/stores/loader-store";
 import { Toasts } from "@backpackapp-io/react-native-toast";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { useAuth } from "@/stores/auth-store";
+import { CreatePost } from "@/components/createPost";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,7 @@ export default function RootLayout() {
 }
 
 function RootContent() {
+  const pathname = usePathname();
   const loading = useLoader((state) => state.loading);
   const { isAuthenticated } = useAuth.getState();
   const footer = useFooter((state) => state.footer);
@@ -43,6 +45,7 @@ function RootContent() {
       <Stack
         screenOptions={{ headerShown: false }}
       />
+      {(isAuthenticated && !pathname.includes("postForm")) && <CreatePost />}
       {(isAuthenticated && footer) && <Footer />}
     </>
   );
