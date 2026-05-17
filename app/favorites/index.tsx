@@ -3,27 +3,43 @@ import Comment from "@/components/comment";
 import { EmptyList } from "@/components/notFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
-import { useApi } from "@/hooks/useApi";
 import { getFavoritesPosts } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 import { Posts } from "@/types/posts/PostTypes";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { FlatList } from "react-native";
+import { ActivityIndicator, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { theme } from "@/globals/theme";
 
 export default function Favorites() {
-    // TODO: Ver possibilidade de caching mais avançado
     const { user } = useAuth.getState();
     const showFooter = useFooter((state) => state.setFooter);
-    const { data: posts, isFetching, isLoading, refetch } = useApi({
-        queryFn: () => getFavoritesPosts(user?.id!),
-        queryKey: ["favorite-posts", user?.id],
-        enabled: !!user,
-        staleTime: 60 * 1000, // 1 minuto
-        gcTime: 15 * 60 * 1000 // 15 minutos
-    });
     const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
+
+    const {
+        data,
+        isLoading,
+        isFetching,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+        refetch,
+    } = useInfiniteQuery({
+        queryKey: ["favorite-posts", user?.id],
+        queryFn: ({ pageParam = 1 }) => getFavoritesPosts(user?.id!, pageParam),
+        enabled: !!user,
+        initialPageParam: 1,
+        staleTime: 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        getNextPageParam: (lastPage) => {
+            const { page, totalPages } = lastPage.data.pagination;
+            return page < totalPages ? page + 1 : undefined;
+        },
+    });
+
+    const posts = data?.pages.flatMap((page) => page.data.data) ?? [];
 
     const handleOpenComments = useCallback((post: Posts) => {
         showFooter(false);
@@ -40,21 +56,36 @@ export default function Favorites() {
             <SafeAreaView style={{ flex: 1 }}>
                 <FlatList
                     style={{ width: "100%" }}
-                    ListEmptyComponent={<EmptyList />}
                     contentContainerStyle={{ paddingBottom: 60 }}
-                    data={isLoading ? Array(6).fill({}) : posts?.data ?? []}
+                    ListEmptyComponent={!isLoading ? <EmptyList /> : null}
+                    data={isLoading ? Array(6).fill({}) : posts}
                     keyExtractor={(item: Posts, index) =>
-                        isLoading ? index?.toString() : item?.postId?.toString()
+                        isLoading ? index.toString() : item?.postId?.toString()
                     }
                     renderItem={({ item }) =>
                         isLoading ? (
                             <Skeleton />
                         ) : (
-                            <PostCard post={item} onOpenComments={handleOpenComments} />
+                            <PostCard
+                                post={item}
+                                onSuccess={refetch}
+                                onOpenComments={handleOpenComments}
+                            />
                         )
                     }
-                    refreshing={isFetching}
+                    refreshing={isFetching && !isFetchingNextPage}
                     onRefresh={refetch}
+                    onEndReached={() => {
+                        if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+                    }}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={
+                        isFetchingNextPage ? (
+                            <View style={{ paddingVertical: 16 }}>
+                                <ActivityIndicator color={theme.colors.lightGreen} />
+                            </View>
+                        ) : null
+                    }
                 />
             </SafeAreaView>
             <Comment

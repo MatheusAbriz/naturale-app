@@ -1,5 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { UserSimpleDetails } from "../auth"
+import type { InfiniteData } from "@tanstack/react-query";
 
 export type Posts = {
     postId: number,
@@ -25,6 +26,17 @@ export type PostsCache = AxiosResponse<{
         totalPages: number;
     };
 }>;
+
+
+export type PostsInfiniteCache = InfiniteData<AxiosResponse<{
+    data: Posts[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}>>;
 
 export type PostDetailCache = AxiosResponse<{
     data: Posts;
