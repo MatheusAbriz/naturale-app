@@ -1,5 +1,6 @@
 import { insertFavorite } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
+import { useSearch } from "@/stores/search-store";
 import type { Posts, PostsInfiniteCache } from "@/types/posts/PostTypes";
 import { toast } from "@backpackapp-io/react-native-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 export function useFavoritePost() {
     const queryClient = useQueryClient();
     const user = useAuth((state) => state.user);
+    const search = useSearch((state) => state.search);
 
     const updateHomePosts = (postId: number) => (oldData: PostsInfiniteCache | undefined): PostsInfiniteCache | undefined => {
         if (!oldData?.pages) return oldData;
@@ -45,7 +47,7 @@ export function useFavoritePost() {
                 })),
             };
         } else {
-            const homePosts = queryClient.getQueryData<PostsInfiniteCache>(["posts", user?.id]);
+            const homePosts = queryClient.getQueryData<PostsInfiniteCache>(["posts", user?.id, search]);
             const postToAdd = homePosts?.pages
                 .flatMap((page) => page.data.data)
                 .find((post) => post.postId === postId);
@@ -79,15 +81,15 @@ export function useFavoritePost() {
         onMutate: async (postId) => {
             if (!user?.id) return;
 
-            await queryClient.cancelQueries({ queryKey: ["posts", user.id] });
+            await queryClient.cancelQueries({ queryKey: ["posts", user.id, search] });
             await queryClient.cancelQueries({ queryKey: ["favorite-posts", user.id] });
             await queryClient.cancelQueries({ queryKey: ["post", postId] });
 
-            const prevPosts = queryClient.getQueryData<PostsInfiniteCache>(["posts", user.id]);
+            const prevPosts = queryClient.getQueryData<PostsInfiniteCache>(["posts", user.id, search]);
             const prevFavorites = queryClient.getQueryData<PostsInfiniteCache>(["favorite-posts", user.id]);
             const prevDetail = queryClient.getQueryData<Posts>(["post", postId]);
 
-            queryClient.setQueryData<PostsInfiniteCache>(["posts", user.id], updateHomePosts(postId));
+            queryClient.setQueryData<PostsInfiniteCache>(["posts", user.id, search], updateHomePosts(postId));
             queryClient.setQueryData<PostsInfiniteCache>(["favorite-posts", user.id], updateFavoritePosts(postId));
             queryClient.setQueryData<Posts>(["post", postId], updateDetail(postId));
 
@@ -98,7 +100,7 @@ export function useFavoritePost() {
             console.error(err);
             toast.error(`Erro! ${err}`);
             if (context?.prevPosts)
-                queryClient.setQueryData<PostsInfiniteCache>(["posts", user?.id], context.prevPosts);
+                queryClient.setQueryData<PostsInfiniteCache>(["posts", user?.id, search], context.prevPosts);
             if (context?.prevFavorites)
                 queryClient.setQueryData<PostsInfiniteCache>(["favorite-posts", user?.id], context.prevFavorites);
             if (context?.prevDetail)
