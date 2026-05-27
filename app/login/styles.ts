@@ -7,21 +7,17 @@ import styled from "styled-components/native";
 
 export const Container = styled(SafeAreaView)`
     flex: 1;
-    gap: ${theme.paddings.m};
-
-    justify-content: flex-end;
-    align-items: center;
 `;
 
 export const ImageBackground = styled(RnImageBackground)`
-    flex: 1;
-    justify-content: space-between;
-    align-items: center;
-
-    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 `;
 
-export const FormArea = styled(SafeAreaView)`
+export const FormArea = styled.View`
     width: 100%;
     max-width: 300px;
     gap: ${theme.paddings.m};

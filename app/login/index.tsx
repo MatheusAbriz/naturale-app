@@ -9,9 +9,9 @@ import { toast } from "@backpackapp-io/react-native-toast";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import Icon from "react-native-vector-icons/AntDesign";
-import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, StyledPressable, SubText, Text } from "./styles";
+import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, SubText, Text } from "./styles";
 import { useAuth } from "@/stores/auth-store";
-import { Pressable } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable } from "react-native";
 
 export default function Login() {
     const { control, getValues } = useForm();
@@ -41,34 +41,25 @@ export default function Login() {
             setLoading(false);
         }
     }
+
     return (
         <Container>
-            <ImageBackground
-                source={BackgroundLogin}
-                resizeMode="cover"
+            <ImageBackground source={BackgroundLogin} resizeMode="cover" />
+
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{ flex: 1, width: "100%", justifyContent: "space-between", alignItems: "center" }}
             >
                 <Logo width={300} height={300} />
 
                 <FormArea>
                     <InputArea>
-                        <Icon
-                            name="mail"
-                            size={20}
-                            color={theme.colors.lightGreen}
-                        />
-                        <Input
-                            name="email"
-                            placeholder="exemplo@gmail.com"
-                            control={control}
-                        />
+                        <Icon name="mail" size={20} color={theme.colors.lightGreen} />
+                        <Input name="email" placeholder="exemplo@gmail.com" control={control} />
                     </InputArea>
 
                     <InputArea style={{ marginBottom: 8 }}>
-                        <Icon
-                            name="lock"
-                            size={20}
-                            color={theme.colors.lightGreen}
-                        />
+                        <Icon name="lock" size={20} color={theme.colors.lightGreen} />
                         <Input
                             name="password"
                             secureTextEntry
@@ -79,11 +70,7 @@ export default function Login() {
                         />
                     </InputArea>
 
-                    <LoginButton
-                        title="Entrar"
-                        onPress={submit}
-                        disabled={loading}
-                    />
+                    <LoginButton title="Entrar" onPress={submit} disabled={loading} />
                     <Divider />
 
                     <SubText>
@@ -91,8 +78,7 @@ export default function Login() {
                         <Span onPress={() => router.push("/register")}> Cadastre-se</Span>
                     </SubText>
                 </FormArea>
-            </ImageBackground>
-
+            </KeyboardAvoidingView>
         </Container>
-    )
+    );
 };

@@ -29,4 +29,4 @@ export function Input({ name, placeholder, autoCapitalize = "none", control, sty
         >
         </Controller>
     )
-} ''
+}

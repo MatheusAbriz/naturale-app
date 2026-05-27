@@ -9,7 +9,7 @@ import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 import { Posts } from "@/types/posts/PostTypes";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
