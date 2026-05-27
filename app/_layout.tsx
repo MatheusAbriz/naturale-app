@@ -36,7 +36,7 @@ export default function RootLayout() {
 function RootContent() {
   const pathname = usePathname();
   const loading = useLoader((state) => state.loading);
-  const { isAuthenticated } = useAuth.getState();
+  const isAuthenticated = useAuth((state) => state.isAuthenticated);
   const footer = useFooter((state) => state.footer);
 
   return (

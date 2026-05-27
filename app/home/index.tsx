@@ -4,7 +4,6 @@ import { EmptyList } from "@/components/notFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
 import { theme } from "@/globals/theme";
-import { useApi } from "@/hooks/useApi";
 import { getPosts } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";

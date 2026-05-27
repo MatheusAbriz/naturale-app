@@ -7,7 +7,7 @@ import { useAuth } from "@/stores/auth-store";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { loading } = useLoader();
-  const { isAuthenticated } = useAuth.getState();
+  const isAuthenticated = useAuth((state) => state.isAuthenticated);
 
   if (loading) return <Loader />;
   if (!isAuthenticated) return <Redirect href="/login" />;
