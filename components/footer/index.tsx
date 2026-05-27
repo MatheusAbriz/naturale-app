@@ -1,5 +1,5 @@
 import { theme } from "@/globals/theme";
-import ChatBubbleOutline from "@react-native-vector-icons/ionicons";
+import ChatBubbleOutline, { Ionicons } from "@react-native-vector-icons/ionicons";
 import House from "@react-native-vector-icons/lucide";
 import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import { usePathname, useRouter } from "expo-router";
@@ -7,8 +7,10 @@ import { Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FavoriteBorder from "react-native-vector-icons/MaterialIcons";
 import { FooterView, IconContainer, TextIcon } from "./styles";
+import { useAuth } from "@/stores/auth-store";
 
 export function Footer() {
+  const logout = useAuth((state) => state.logout);
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const router = useRouter();
@@ -74,6 +76,12 @@ export function Footer() {
         </IconContainer>
       </Pressable>
 
+      <Pressable onPress={() => logout()}>
+        <IconContainer>
+          <TextIcon isActive={false}>Sair</TextIcon>
+          <Ionicons name="log-out-outline" size={24} color={theme.colors.lightGreen} />
+        </IconContainer>
+      </Pressable>
     </FooterView>
   );
 }

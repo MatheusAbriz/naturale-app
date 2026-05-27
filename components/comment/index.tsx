@@ -27,7 +27,7 @@ type CommentProps = {
 
 export default function Comment({ post, isOpen, onClose }: CommentProps) {
     const { user } = useAuth.getState();
-    const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage, refetch: commentsRefetch } = useInfiniteQuery({
         queryKey: ["comments", post?.postId, user?.id],
         queryFn: ({ pageParam = 1 }) => getComments(post?.postId!, pageParam),
         enabled: !!post && !!user,
@@ -129,7 +129,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
                     isLoading ? (
                         <Skeleton />
                     ) : (
-                        <CommentItem comment={item} />
+                        <CommentItem comment={item} postId={post?.postId!} currentUserId={user?.id!} refetch={commentsRefetch} />
                     )
 
                 }

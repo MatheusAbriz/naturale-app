@@ -14,3 +14,23 @@ export type CreateComment = {
     user_id: number,
     comment_text: string
 };
+
+export type CreateReply = CreateComment & {
+    parent_comment_id: number
+}
+
+export type CommentsResponse = {
+    status: boolean;
+    msg: CommentDTO[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+};
+ 
+export type RepliesResponse = {
+    status: boolean;
+    msg: CommentDTO[];
+};

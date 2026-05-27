@@ -7,7 +7,7 @@ export const Container = styled(Pressable)`
     justify-content: center;
     align-items: center;
     position: absolute;
-    bottom: 85px;
+    bottom: 100px;
     right: 0;
 
     width: 48px;

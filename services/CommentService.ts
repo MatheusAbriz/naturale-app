@@ -1,5 +1,5 @@
 import { API } from "@/hooks/useApi";
-import { CommentDTO, CreateComment } from "@/types/comments";
+import { CommentDTO, CreateComment, type CreateReply, type RepliesResponse } from "@/types/comments";
 
 export type CommentsResponse = {
     status: boolean;
@@ -20,4 +20,12 @@ export function getComments(postId: number | string, page: number = 1) {
 
 export function addComment(comment: CreateComment) {
     return API.post("/comments", comment);
+}
+
+export function getReplies(commentId: number) {
+    return API.get<RepliesResponse>(`/comments/${commentId}/replies`);
+}
+ 
+export function addReply(reply: CreateReply) {
+    return API.post<CommentDTO>("/comments/reply", reply);
 }

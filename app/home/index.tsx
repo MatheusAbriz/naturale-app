@@ -15,7 +15,6 @@ import { ActivityIndicator, FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
-  // TODO: Ver possibilidade de caching mais avançado
   const user = useAuth((state) => state.user);
   const showFooter = useFooter((state) => state.setFooter);
   const {
