@@ -7,6 +7,7 @@ import { theme } from "@/globals/theme";
 import { getPosts } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
+import { useSearch } from "@/stores/search-store";
 import { Posts } from "@/types/posts/PostTypes";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
@@ -16,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Home() {
   const user = useAuth((state) => state.user);
   const showFooter = useFooter((state) => state.setFooter);
+  const search = useSearch((state) => state.search);
   const {
     data,
     isLoading,
@@ -25,8 +27,8 @@ export default function Home() {
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["posts", user?.id],
-    queryFn: ({ pageParam = 1 }) => getPosts(pageParam),
+    queryKey: ["posts", user?.id, search],
+    queryFn: ({ pageParam = 1 }) => getPosts(pageParam, search),
     enabled: !!user,
     initialPageParam: 1,
     staleTime: 60 * 1000,

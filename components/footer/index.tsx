@@ -8,17 +8,34 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FavoriteBorder from "react-native-vector-icons/MaterialIcons";
 import { FooterView, IconContainer, TextIcon } from "./styles";
 import { useAuth } from "@/stores/auth-store";
+import { useState } from "react";
+import { SearchOverlayModal } from "../modals/modalSearch";
+import { useSearch } from "@/stores/search-store";
 
 export function Footer() {
   const logout = useAuth((state) => state.logout);
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const router = useRouter();
-  const isHomeActive = pathname.includes("home") || pathname === "/";
+  const search = useSearch((state) => state.search);
+
+  const isHomeActive = (pathname.includes("home") || pathname === "/");
   const isFavoritesActive = pathname.includes("favorites");
   const isChatActive = pathname.includes("chat");
 
-  return (
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  function openSearch() {
+
+    setSearchOpen(true);
+  }
+
+  function closeSearch() {
+    setSearchOpen(false);
+  }
+
+
+  return (<>
     <FooterView style={{ height: 60 + insets.bottom, paddingBottom: insets.bottom }}>
 
       <Pressable onPress={() => router.push("/home")}>
@@ -57,6 +74,18 @@ export function Footer() {
         </IconContainer>
       </Pressable>
 
+      <Pressable onPress={openSearch}>
+        <IconContainer>
+          <TextIcon isActive={!!search}>Buscar</TextIcon>
+          {!!search ? (
+            <Ionicons name="search-sharp" size={24} color={theme.colors.lightGreen} />
+          ) : (
+            <Ionicons name="search-outline" size={24} color={theme.colors.lightGreen} />
+          )}
+        </IconContainer>
+      </Pressable>
+
+
       <Pressable onPress={() => router.push("/chatbot")}>
         <IconContainer>
           <TextIcon isActive={isChatActive}>Chatbot</TextIcon>
@@ -83,5 +112,12 @@ export function Footer() {
         </IconContainer>
       </Pressable>
     </FooterView>
-  );
+
+    {searchOpen && (
+      <SearchOverlayModal
+        visible={searchOpen}
+        onClose={closeSearch}
+      />
+    )}
+  </>);
 }

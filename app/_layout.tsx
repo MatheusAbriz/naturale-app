@@ -11,6 +11,8 @@ import { Toasts } from "@backpackapp-io/react-native-toast";
 import { Stack, usePathname } from "expo-router";
 import { useAuth } from "@/stores/auth-store";
 import { CreatePost } from "@/components/createPost";
+import { useSearch } from "@/stores/search-store";
+import { IconSearch } from "@/components/icon-search";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +40,7 @@ function RootContent() {
   const loading = useLoader((state) => state.loading);
   const isAuthenticated = useAuth((state) => state.isAuthenticated);
   const footer = useFooter((state) => state.footer);
+  const search = useSearch((state) => state.search);
 
   return (
     <>
@@ -45,6 +48,7 @@ function RootContent() {
       <Stack
         screenOptions={{ headerShown: false }}
       />
+      {(isAuthenticated && search) && <IconSearch />}
       {(isAuthenticated && !pathname.includes("postForm")) && <CreatePost />}
       {(isAuthenticated && footer) && <Footer />}
     </>

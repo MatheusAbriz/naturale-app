@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import Icon from "react-native-vector-icons/AntDesign";
 import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, SubText, Text } from "./styles";
 import { useAuth } from "@/stores/auth-store";
-import { KeyboardAvoidingView, Platform, Pressable } from "react-native";
+import { KeyboardAvoidingView, Platform } from "react-native";
 
 export default function Login() {
     const { control, getValues } = useForm();
