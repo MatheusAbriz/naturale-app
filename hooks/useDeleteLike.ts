@@ -59,7 +59,7 @@ export function useDeleteLike() {
             return { prevPosts, prevFavorites, prevDetail, postId };
         },
 
-        onError: (err, postId, context) => {
+        onError: (err, _postId, context) => {
             console.error(err);
             toast.error(`Erro! ${err}`);
             if (context?.prevPosts)
