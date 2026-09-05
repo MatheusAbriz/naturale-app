@@ -1,7 +1,17 @@
+import { Platform } from "react-native";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist, createJSONStorage, StateStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import { User } from "@/types/auth";
+
+const secureStorage: StateStorage = {
+  getItem: (name) => SecureStore.getItemAsync(name),
+  setItem: (name, value) => SecureStore.setItemAsync(name, value),
+  removeItem: (name) => SecureStore.deleteItemAsync(name),
+};
+
+const authStorage = Platform.OS === "web" ? AsyncStorage : secureStorage;
 
 type AuthStore = {
   user: User | null;
@@ -33,7 +43,7 @@ export const useAuth = create<AuthStore>()(
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => authStorage),
     }
   )
 );
