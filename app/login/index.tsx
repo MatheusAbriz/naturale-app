@@ -9,7 +9,7 @@ import { toast } from "@backpackapp-io/react-native-toast";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import Icon from "react-native-vector-icons/AntDesign";
-import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, SubText, Text } from "./styles";
+import { Container, Divider, FormArea, ImageBackground, InputArea, LoginButton, Span, SubText, Text } from "@/styles/login";
 import { useAuth } from "@/stores/auth-store";
 import { KeyboardAvoidingView, Platform } from "react-native";
 

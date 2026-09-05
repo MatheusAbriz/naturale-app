@@ -34,7 +34,7 @@ import {
     RegisterButtonText,
     ScrollArea,
     SectionLabel,
-} from "./styles";
+} from "@/styles/register";
 
 export default function Register() {
     const { control, getValues, setValue, watch } = useForm<UserDTO>();

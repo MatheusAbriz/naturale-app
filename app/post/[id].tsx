@@ -45,7 +45,7 @@ import {
     MetaText,
     SectionTitle,
     Title,
-} from "./styles";
+} from "@/styles/post";
 import { EmptyList } from "@/components/notFound";
 
 export default function PostDetail() {

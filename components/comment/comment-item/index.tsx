@@ -4,21 +4,15 @@ import {
   Image,
   Keyboard,
   LayoutAnimation,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
-  UIManager,
   View,
 } from "react-native";
 
 import { CommentDTO } from "@/types/comments";
 import { addReply } from "@/services/CommentService";
 import { useQueryClient } from "@tanstack/react-query";
-
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 const MAX_NEST_LEVEL = 2;
 

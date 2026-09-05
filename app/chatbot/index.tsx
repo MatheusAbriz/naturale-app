@@ -21,7 +21,7 @@ import {
     CharCount,
     ClearButton,
     ClearButtonText,
-} from "./styles";
+} from "@/styles/chatbot";
 import { theme } from "@/globals/theme";
 import { toast } from "@backpackapp-io/react-native-toast";
 import IonIcon from "react-native-vector-icons/Ionicons";

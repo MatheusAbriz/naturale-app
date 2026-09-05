@@ -34,7 +34,7 @@ import {
     TimeChip,
     TimeChipText,
     TimeGrid,
-} from "./styles";
+} from "@/styles/postForm";
 import { Footer } from "@/components/footer";
 import { useQueryClient } from "@tanstack/react-query";
 

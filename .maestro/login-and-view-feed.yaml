@@ -1,0 +1,31 @@
+# Fluxo crítico: login -> ver feed (home).
+# Precisa de uma conta de teste já cadastrada no backend (crie uma pela tela
+# de registro uma vez, e reutilize as credenciais aqui).
+#
+# Rodar com:
+#   maestro test --env TEST_USER_EMAIL=seu@email.com --env TEST_USER_PASSWORD=suasenha .maestro/login-and-view-feed.yaml
+#
+# Pré-requisito: `npx expo start` rodando (Metro na porta 8081) e um simulador
+# com Expo Go aberto.
+#
+# URL do Metro: 10.0.2.2 = emulador Android enxergando o host.
+# Testando em iOS Simulator, troque para 127.0.0.1.
+# Testando em device físico, troque para o IP da sua máquina na rede local.
+
+appId: host.exp.exponent
+---
+- launchApp:
+    clearState: true
+- openLink: "exp://10.0.2.2:8081"
+- extendedWaitUntil:
+    visible: "exemplo@gmail.com"
+    timeout: 45000
+- tapOn: "exemplo@gmail.com"
+- inputText: ${TEST_USER_EMAIL}
+- tapOn: "******"
+- inputText: ${TEST_USER_PASSWORD}
+- hideKeyboard
+- tapOn: "Entrar"
+- extendedWaitUntil:
+    visible: "Início"
+    timeout: 15000

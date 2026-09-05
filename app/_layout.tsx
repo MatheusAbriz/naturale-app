@@ -1,5 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { LogBox } from "react-native";
+
+// Testes E2E (Maestro) rodam com essa env var pra impedir que o overlay do
+// LogBox cubra botões e trave os toques automatizados. Não afeta o dev normal.
+if (process.env.EXPO_PUBLIC_DISABLE_LOGBOX === "true") {
+  LogBox.ignoreAllLogs(true);
+}
 
 import { Footer } from "@/components/footer";
 import { Loader } from "@/components/loader";
