@@ -17,4 +17,4 @@ appId: host.exp.exponent
     visible: "exemplo@gmail.com"
     timeout: 45000
 - assertVisible: "Entrar"
-- assertVisible: "Cadastre-se"
+- assertVisible: "Não tem uma conta\\? Cadastre-se"
