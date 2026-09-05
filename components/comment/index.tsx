@@ -74,7 +74,7 @@ export default function Comment({ post, isOpen, onClose }: CommentProps) {
             await queryClient.invalidateQueries({ queryKey: ["comments"] });
         } catch (e) {
             console.error(e);
-            toast.error(e);
+            toast.error("Erro ao comentar. Tente novamente mais tarde");
         }
     }
 

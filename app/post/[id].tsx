@@ -47,10 +47,9 @@ import {
     Title,
 } from "./styles";
 import { EmptyList } from "@/components/notFound";
-import { toast } from "@backpackapp-io/react-native-toast";
 
 export default function PostDetail() {
-    const { id } = useLocalSearchParams<{ id: number }>();
+    const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { user } = useAuth.getState();
     const showFooter = useFooter((state) => state.setFooter);
@@ -67,22 +66,12 @@ export default function PostDetail() {
         enabled: !!id && !!user?.id,
     });
 
-    async function toggleLike() {
-        try {
-            mutateLike(data?.postId!);
-        } catch (e) {
-            console.error(e);
-            toast.error("Erro! Tente novamente mais tarde");
-        }
+    function toggleLike() {
+        mutateLike(data?.postId!);
     }
 
-    async function toggleFavorite() {
-        try {
-            mutateFavorite(data?.postId!);
-        } catch (e) {
-            console.error(e);
-            toast.error("Erro! Tente novamente mais tarde");
-        }
+    function toggleFavorite() {
+        mutateFavorite(data?.postId!);
     }
 
     const handleOpenComments = useCallback(() => {

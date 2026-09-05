@@ -7,7 +7,6 @@ import { theme } from "@/globals/theme";
 import { useFooter } from "@/stores/hide-footer-store";
 import { Paginated } from "@/types/pagination/PaginationTypes";
 import { Posts } from "@/types/posts/PostTypes";
-import { toast } from "@backpackapp-io/react-native-toast";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { memo, useState } from "react";
@@ -31,22 +30,12 @@ export const PostCard = memo(function PostCard({ post, onOpenComments }: CardPro
     const { mutate, isPending } = useDeleteLike();
     const { mutate: mutateFavorite, isPending: isFavoritedPending } = useFavoritePost();
 
-    async function toggleLike() {
-        try {
-            mutate(post?.postId);
-        } catch (e) {
-            console.error(e);
-            toast.error(`Erro! ${e}`);
-        }
+    function toggleLike() {
+        mutate(post?.postId);
     };
 
-    async function toggleFavorite() {
-        try {
-            mutateFavorite(post?.postId);
-        } catch (e) {
-            console.error(e);
-            toast.error("Erro! Tente novamente mais tarde");
-        }
+    function toggleFavorite() {
+        mutateFavorite(post?.postId);
     };
 
     function handleOpenComments() {
