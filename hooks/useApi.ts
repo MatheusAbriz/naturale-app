@@ -1,11 +1,10 @@
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
-import Constants from "expo-constants";
 import { toast } from "@backpackapp-io/react-native-toast";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 
-const API_URL = Constants.expoConfig?.extra?.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const API = axios.create({
   baseURL: API_URL,

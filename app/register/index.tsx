@@ -1,6 +1,7 @@
 import { Input } from "@/components/inputs/input";
 import { theme } from "@/globals/theme";
 import { register } from "@/services/AuthService";
+import { uploadImage } from "@/services/ImageService";
 import { useAuth } from "@/stores/auth-store";
 import { useLoader } from "@/stores/loader-store";
 import { UserDTO } from "@/types/auth";
@@ -9,6 +10,7 @@ import { toast } from "@backpackapp-io/react-native-toast";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import IonIcon from "react-native-vector-icons/Ionicons";
@@ -39,6 +41,7 @@ export default function Register() {
     const { loading, setLoading } = useLoader();
     const { signIn } = useAuth.getState();
     const router = useRouter();
+    const [avatarAsset, setAvatarAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const avatarUri = watch("avatar");
 
     async function pickAvatar() {
@@ -49,7 +52,7 @@ export default function Register() {
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ["images"],
             allowsEditing: true,
             aspect: [1, 1],
             quality: 0.8,
@@ -57,19 +60,22 @@ export default function Register() {
 
         if (!result.canceled) {
             setValue("avatar", result.assets[0].uri);
+            setAvatarAsset(result.assets[0]);
         }
     }
 
     async function submit() {
         try {
             setLoading(true);
-            const { name, username, phone, cpf, email, password, avatar } = getValues();
+            const { name, username, phone, cpf, email, password } = getValues();
 
             if (!name?.trim()) return toast.error("Informe seu nome.");
             if (!email?.trim()) return toast.error("Informe seu e-mail.");
             if (!password?.trim()) return toast.error("Informe uma senha.");
             if (!phone?.trim()) return toast.error("Informe seu telefone.");
             if (!cpf?.trim()) return toast.error("Informe seu CPF.");
+
+            const avatarUrl = avatarAsset ? await uploadImage(avatarAsset, "usuarios") : "";
 
             const payload: UserDTO = {
                 name,
@@ -79,7 +85,7 @@ export default function Register() {
                 email,
                 password,
                 type: "USER",
-                avatar: avatar ?? "",
+                avatar: avatarUrl,
             };
 
             const res = await register(payload);

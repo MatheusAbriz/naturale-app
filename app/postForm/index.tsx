@@ -2,11 +2,13 @@ import { Input } from "@/components/inputs/input";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { theme } from "@/globals/theme";
 import { createPost } from "@/services/PostService";
+import { uploadImage } from "@/services/ImageService";
 import { useAuth } from "@/stores/auth-store";
 import { useLoader } from "@/stores/loader-store";
 import { toast } from "@backpackapp-io/react-native-toast";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -67,6 +69,7 @@ export default function CreatePost() {
         name: "ingredients",
     });
 
+    const [imageAsset, setImageAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const selectedTime = watch("time");
     const imageUri = watch("image");
 
@@ -78,7 +81,7 @@ export default function CreatePost() {
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ["images"],
             allowsEditing: true,
             aspect: [4, 3],
             quality: 0.8,
@@ -86,6 +89,7 @@ export default function CreatePost() {
 
         if (!result.canceled) {
             setValue("image", result.assets[0].uri);
+            setImageAsset(result.assets[0]);
         }
     }
 
@@ -95,7 +99,7 @@ export default function CreatePost() {
 
             if (!title.trim()) return toast.error("Adicione um título.");
             if (!text.trim()) return toast.error("Adicione uma descrição.");
-            if (!image) return toast.error("Adicione uma imagem.");
+            if (!image || !imageAsset) return toast.error("Adicione uma imagem.");
             if (!time) return toast.error("Selecione o tempo de preparo.");
 
             const filledIngredients = ingredients.filter((i) => i.value.trim());
@@ -104,12 +108,14 @@ export default function CreatePost() {
 
             setLoading(true);
 
+            const imageUrl = await uploadImage(imageAsset, "posts");
+
             await createPost({
                 userId: user?.id!,
                 title,
                 text,
                 ingredients: filledIngredients.map((i) => i.value).join(", "),
-                image,
+                image: imageUrl,
                 time,
                 status: true,
             });
