@@ -60,7 +60,7 @@ export default function PostDetail() {
     const { data, isLoading, isError } = useQuery({
         queryKey: ["post", Number(id)],
         queryFn: async () => {
-            const res = await getPostById(Number(id), user?.id!);
+            const res = await getPostById(Number(id));
             return res.data as Posts;
         },
         enabled: !!id && !!user?.id,

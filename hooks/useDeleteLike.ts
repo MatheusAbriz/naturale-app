@@ -39,7 +39,7 @@ export function useDeleteLike() {
     };
 
     return useMutation({
-        mutationFn: (postId: number) => insertLike(user?.id!, postId),
+        mutationFn: (postId: number) => insertLike(postId),
 
         onMutate: async (postId) => {
             if (!user?.id) return;

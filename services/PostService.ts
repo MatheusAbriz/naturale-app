@@ -6,20 +6,20 @@ export function getPosts(page = 1, search="") {
     return API.get<Paginated<Posts[]>>(`/posts?page=${page}&search=${search}`);
 }
 
-export function getPostById(postId: number, userId: number) {
-    return API.get<Posts>(`/posts/${postId}/${userId}`);
+export function getPostById(postId: number) {
+    return API.get<Posts>(`/posts/${postId}`);
 }
 
-export function getFavoritesPosts(userId: number, page=1) {
-    return API.get<Paginated<Posts[]>>(`/favorites/${userId}?page=${page}`)
+export function getFavoritesPosts(page=1) {
+    return API.get<Paginated<Posts[]>>(`/favorites?page=${page}`)
 }
 
-export function insertLike(userId: number | string, postId: number | string) {
-    return API.patch(`/posts/${postId}/like/${userId}`);
+export function insertLike(postId: number | string) {
+    return API.patch(`/posts/${postId}/like`);
 }
 
-export function insertFavorite(userId: number | string, postId: number | string) {
-    return API.patch(`/favorites/${userId}/${postId}`);
+export function insertFavorite(postId: number | string) {
+    return API.patch(`/favorites/${postId}`);
 }
 
 export async function createPost(data: CreatePostDTO) {

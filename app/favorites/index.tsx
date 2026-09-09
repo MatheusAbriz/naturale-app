@@ -28,7 +28,7 @@ export default function Favorites() {
         refetch,
     } = useInfiniteQuery({
         queryKey: ["favorite-posts", user?.id],
-        queryFn: ({ pageParam = 1 }) => getFavoritesPosts(user?.id!, pageParam),
+        queryFn: ({ pageParam = 1 }) => getFavoritesPosts(pageParam),
         enabled: !!user,
         initialPageParam: 1,
         staleTime: 60 * 1000,

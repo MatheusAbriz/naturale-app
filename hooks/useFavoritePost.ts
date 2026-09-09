@@ -76,7 +76,7 @@ export function useFavoritePost() {
     };
 
     return useMutation({
-        mutationFn: (postId: number) => insertFavorite(user?.id!, postId),
+        mutationFn: (postId: number) => insertFavorite(postId),
 
         onMutate: async (postId) => {
             if (!user?.id) return;
