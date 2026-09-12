@@ -51,3 +51,11 @@ export type CreatePostDTO = {
     time: string,
     status: boolean
 }
+
+export type UpdatePostDTO = {
+    title: string,
+    text: string,
+    ingredients: string,
+    image: string,
+    time: string,
+}

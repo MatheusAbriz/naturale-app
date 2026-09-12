@@ -1,5 +1,6 @@
 export type CommentDTO = {
     id: number;
+    user_id: number;
     text: string;
     created_at: string;
     parent_comment_id: number | null;

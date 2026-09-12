@@ -18,12 +18,13 @@ type AuthStore = {
   isAuthenticated: boolean;
 
   signIn: (data: User) => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
   logout: () => Promise<void>;
 };
 
 export const useAuth = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
 
@@ -32,6 +33,12 @@ export const useAuth = create<AuthStore>()(
           user: data,
           isAuthenticated: true,
         });
+      },
+
+      updateUser: (data) => {
+        const current = get().user;
+        if (!current) return;
+        set({ user: { ...current, ...data } });
       },
 
       logout: async () => {

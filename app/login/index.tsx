@@ -70,6 +70,10 @@ export default function Login() {
                         />
                     </InputArea>
 
+                    <SubText style={{ textAlign: "right", marginBottom: 8 }}>
+                        <Span onPress={() => router.push("/forgot-password")}>Esqueci minha senha</Span>
+                    </SubText>
+
                     <LoginButton title="Entrar" onPress={submit} disabled={loading} />
                     <Divider />
 

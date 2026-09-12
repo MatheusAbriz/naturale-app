@@ -45,6 +45,7 @@ export const PostCard = memo(function PostCard({ post, onOpenComments }: CardPro
 
     return (
         <Pressable
+            testID={`post-card-${post?.postId}`}
             onPress={() => router.push(`/post/${post?.postId}`)}
         >
             <Card className="p-0 w-full mx-auto bg-[#F2F2F2] border-b border-gray-300">

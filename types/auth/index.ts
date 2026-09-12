@@ -2,11 +2,22 @@ import { UserRoles } from "@/enums/AuthEnums";
 
 export type User = {
   id: number;
+  name: string;
   email: string;
   username: string;
   role: UserRoles;
   avatar: string;
   token: string;
+};
+
+export type UserProfile = {
+  id: number;
+  name: string;
+  username: string;
+  phone: string;
+  email: string;
+  type: UserRoles;
+  avatar: string;
 };
 
 export type UserSimpleDetails = {

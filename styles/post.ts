@@ -40,10 +40,32 @@ export const Title = styled.Text`
     line-height: 28px;
 `;
 
-export const AuthorRow = styled.View`
+export const AuthorRow = styled.Pressable`
     flex-direction: row;
     align-items: center;
     gap: 10px;
+`;
+
+export const OwnerActionsRow = styled.View`
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+`;
+
+export const OwnerActionButton = styled.Pressable`
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    align-items: center;
+    justify-content: center;
+    background-color: ${theme.colors.lightWhite};
+`;
+
+export const TitleRow = styled.View`
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
 `;
 
 export const AuthorName = styled.Text`

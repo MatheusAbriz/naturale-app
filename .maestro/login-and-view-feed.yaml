@@ -1,4 +1,4 @@
-# Fluxo crítico: login -> ver feed (home).
+# Fluxo crítico: login -> ver feed (home) -> abrir um post.
 # Precisa de uma conta de teste já cadastrada no backend (crie uma pela tela
 # de registro uma vez, e reutilize as credenciais aqui).
 #
@@ -28,4 +28,14 @@ appId: host.exp.exponent
 - tapOn: "Entrar"
 - extendedWaitUntil:
     visible: "Início"
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: "post-card-.*"
+    timeout: 15000
+- tapOn:
+    id: "post-card-.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "Ver comentários"
     timeout: 15000

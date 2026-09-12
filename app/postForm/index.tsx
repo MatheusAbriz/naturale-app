@@ -1,14 +1,14 @@
 import { Input } from "@/components/inputs/input";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { theme } from "@/globals/theme";
-import { createPost } from "@/services/PostService";
+import { createPost, getPostById, updatePost } from "@/services/PostService";
 import { uploadImage } from "@/services/ImageService";
 import { useAuth } from "@/stores/auth-store";
 import { useLoader } from "@/stores/loader-store";
 import { toast } from "@backpackapp-io/react-native-toast";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -50,6 +50,8 @@ type FormValues = {
 
 export default function CreatePost() {
     const { user } = useAuth.getState();
+    const { postId } = useLocalSearchParams<{ postId?: string }>();
+    const isEditMode = !!postId;
     const { setLoading, loading } = useLoader();
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -72,6 +74,26 @@ export default function CreatePost() {
     const [imageAsset, setImageAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const selectedTime = watch("time");
     const imageUri = watch("image");
+
+    useEffect(() => {
+        if (!isEditMode) return;
+
+        getPostById(Number(postId)).then((res) => {
+            const post = res.data;
+            setValue("title", post.title);
+            setValue("text", post.text);
+            setValue("time", post.time);
+            setValue("image", post.image);
+
+            const ingredientList = post.ingredients
+                ? post.ingredients.split(",").map((i) => ({ value: i.trim() })).filter((i) => i.value)
+                : [];
+            setValue("ingredients", ingredientList.length > 0 ? ingredientList : [{ value: "" }]);
+        }).catch((e) => {
+            console.error(e);
+            toast.error("Erro ao carregar post para edição.");
+        });
+    }, [isEditMode, postId]);
 
     async function pickImage() {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -99,7 +121,7 @@ export default function CreatePost() {
 
             if (!title.trim()) return toast.error("Adicione um título.");
             if (!text.trim()) return toast.error("Adicione uma descrição.");
-            if (!image || !imageAsset) return toast.error("Adicione uma imagem.");
+            if (!image) return toast.error("Adicione uma imagem.");
             if (!time) return toast.error("Selecione o tempo de preparo.");
 
             const filledIngredients = ingredients.filter((i) => i.value.trim());
@@ -108,28 +130,42 @@ export default function CreatePost() {
 
             setLoading(true);
 
-            const imageUrl = await uploadImage(imageAsset, "posts");
+            // Só reenvia a imagem se o usuário escolheu uma nova; senão mantém a URL já existente
+            const imageUrl = imageAsset ? await uploadImage(imageAsset, "posts") : image;
 
-            await createPost({
-                userId: user?.id!,
-                title,
-                text,
-                ingredients: filledIngredients.map((i) => i.value).join(", "),
-                image: imageUrl,
-                time,
-                status: true,
-            });
+            if (isEditMode) {
+                await updatePost(Number(postId), {
+                    title,
+                    text,
+                    ingredients: filledIngredients.map((i) => i.value).join(", "),
+                    image: imageUrl,
+                    time,
+                });
+
+                await queryClient.invalidateQueries({ queryKey: ["post", Number(postId)] });
+                toast.success("Post atualizado com sucesso!");
+            } else {
+                await createPost({
+                    userId: user?.id!,
+                    title,
+                    text,
+                    ingredients: filledIngredients.map((i) => i.value).join(", "),
+                    image: imageUrl,
+                    time,
+                    status: true,
+                });
+
+                toast.success("Post criado com sucesso!");
+            }
 
             await queryClient.invalidateQueries({
                 queryKey: ["posts", user?.id],
             });
 
-            toast.success("Post criado com sucesso!");
-
             router.back();
         } catch (e) {
             console.error(e);
-            toast.error("Erro ao criar post. Tente novamente.");
+            toast.error(isEditMode ? "Erro ao atualizar post. Tente novamente." : "Erro ao criar post. Tente novamente.");
         } finally {
             setLoading(false);
         }
@@ -247,7 +283,9 @@ export default function CreatePost() {
 
                             <SubmitButton onPress={submit} disabled={loading}>
                                 <SubmitButtonText>
-                                    {loading ? "Publicando..." : "Publicar receita"}
+                                    {isEditMode
+                                        ? (loading ? "Salvando..." : "Salvar alterações")
+                                        : (loading ? "Publicando..." : "Publicar receita")}
                                 </SubmitButtonText>
                             </SubmitButton>
 

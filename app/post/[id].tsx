@@ -3,17 +3,18 @@ import Comment from "@/components/comment";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
 import { theme } from "@/globals/theme";
-import { getPostById } from "@/services/PostService";
+import { deletePost, getPostById } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
 import { useFooter } from "@/stores/hide-footer-store";
 import { Posts } from "@/types/posts/PostTypes";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, TouchableOpacity, View } from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import IonIcon from "react-native-vector-icons/Ionicons";
+import { toast } from "@backpackapp-io/react-native-toast";
 import { useDeleteLike } from "@/hooks/useDeleteLike";
 import { useFavoritePost } from "@/hooks/useFavoritePost";
 import {
@@ -43,8 +44,11 @@ import {
     IngredientText,
     MetaRow,
     MetaText,
+    OwnerActionButton,
+    OwnerActionsRow,
     SectionTitle,
     Title,
+    TitleRow,
 } from "@/styles/post";
 import { EmptyList } from "@/components/notFound";
 
@@ -56,6 +60,7 @@ export default function PostDetail() {
     const [commentOpen, setCommentOpen] = useState(false);
     const { mutate: mutateLike } = useDeleteLike();
     const { mutate: mutateFavorite } = useFavoritePost();
+    const queryClient = useQueryClient();
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["post", Number(id)],
@@ -66,12 +71,47 @@ export default function PostDetail() {
         enabled: !!id && !!user?.id,
     });
 
+    const isOwner = !!data && data.user?.id === user?.id;
+
     function toggleLike() {
         mutateLike(data?.postId!);
     }
 
     function toggleFavorite() {
         mutateFavorite(data?.postId!);
+    }
+
+    function goToAuthorProfile() {
+        if (data?.user?.id) router.push(`/profile/${data.user.id}`);
+    }
+
+    function handleEditPost() {
+        router.push({ pathname: "/postForm", params: { postId: String(data?.postId) } });
+    }
+
+    function handleDeletePost() {
+        Alert.alert(
+            "Excluir receita",
+            "Tem certeza que deseja excluir esta receita? Essa ação não pode ser desfeita.",
+            [
+                { text: "Cancelar", style: "cancel" },
+                {
+                    text: "Excluir",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await deletePost(data!.postId);
+                            await queryClient.invalidateQueries({ queryKey: ["posts", user?.id] });
+                            toast.success("Post excluído com sucesso!");
+                            router.back();
+                        } catch (e) {
+                            console.error(e);
+                            toast.error("Erro ao excluir post. Tente novamente.");
+                        }
+                    },
+                },
+            ]
+        );
     }
 
     const handleOpenComments = useCallback(() => {
@@ -109,9 +149,22 @@ export default function PostDetail() {
 
                     <Content>
                         <Header>
-                            <Title>{data?.title}</Title>
+                            <TitleRow>
+                                <Title style={{ flex: 1 }}>{data?.title}</Title>
 
-                            <AuthorRow>
+                                {isOwner && (
+                                    <OwnerActionsRow>
+                                        <OwnerActionButton onPress={handleEditPost}>
+                                            <IonIcon name="pencil-outline" size={16} color={theme.colors.lightBlack} />
+                                        </OwnerActionButton>
+                                        <OwnerActionButton onPress={handleDeletePost}>
+                                            <IonIcon name="trash-outline" size={16} color={theme.colors.orange} />
+                                        </OwnerActionButton>
+                                    </OwnerActionsRow>
+                                )}
+                            </TitleRow>
+
+                            <AuthorRow onPress={goToAuthorProfile}>
                                 <Avatar url={data?.user?.avatar} />
                                 <View>
                                     <AuthorName>{data?.user?.name}</AuthorName>

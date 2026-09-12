@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   Keyboard,
   LayoutAnimation,
@@ -11,8 +12,9 @@ import {
 } from "react-native";
 
 import { CommentDTO } from "@/types/comments";
-import { addReply } from "@/services/CommentService";
+import { addReply, deleteComment, deleteReply, editComment, editReply } from "@/services/CommentService";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "@backpackapp-io/react-native-toast";
 
 const MAX_NEST_LEVEL = 2;
 
@@ -151,6 +153,78 @@ function ReplyInput({
   );
 }
 
+type EditInputProps = {
+  initialValue: string;
+  onSubmit: (text: string) => Promise<void>;
+  onCancel: () => void;
+};
+
+function EditInput({ initialValue, onSubmit, onCancel }: EditInputProps) {
+  const [text, setText] = useState(initialValue);
+  const [loading, setLoading] = useState(false);
+
+  const inputRef = useRef<TextInput>(null);
+
+  React.useEffect(() => {
+    setTimeout(() => inputRef.current?.focus(), 150);
+  }, []);
+
+  const handleSubmit = async () => {
+    const trimmed = text.trim();
+
+    if (!trimmed || loading) return;
+
+    setLoading(true);
+
+    try {
+      await onSubmit(trimmed);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const canSubmit = text.trim().length > 0 && !loading;
+
+  return (
+    <View style={{ marginTop: 4 }}>
+      <TextInput
+        ref={inputRef}
+        value={text}
+        onChangeText={setText}
+        multiline
+        maxLength={500}
+        style={{
+          fontSize: 14,
+          color: C.textPrimary,
+          minHeight: 38,
+          maxHeight: 110,
+          borderBottomWidth: 1,
+          borderBottomColor: C.threadLine,
+          lineHeight: 21,
+        }}
+      />
+
+      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 6, gap: 12 }}>
+        <TouchableOpacity onPress={handleSubmit} disabled={!canSubmit} activeOpacity={0.8}>
+          {loading ? (
+            <ActivityIndicator size="small" color={C.accent} />
+          ) : (
+            <Text style={{ fontSize: 12, fontWeight: "700", color: canSubmit ? C.accent : C.textSecondary }}>
+              Salvar
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={onCancel} activeOpacity={0.7}>
+          <Text style={{ fontSize: 12, fontWeight: "600", color: C.textSecondary }}>
+            Cancelar
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 export type CommentItemProps = {
   comment: CommentDTO;
   postId: number;
@@ -165,6 +239,7 @@ export function CommentItem({
   level = 0,
 }: CommentItemProps) {
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -173,6 +248,8 @@ export function CommentItem({
   const replies = comment.replies ?? [];
 
   const hasReplies = replies.length > 0;
+  const isOwner = comment.user_id === currentUserId;
+  const isReply = comment.parent_comment_id !== null;
 
   const handleToggleReplyInput = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -196,6 +273,49 @@ export function CommentItem({
     setShowReplyInput(false);
 
     Keyboard.dismiss();
+  };
+
+  const handleEditSubmit = async (text: string) => {
+    try {
+      if (isReply) {
+        await editReply(comment.id, text);
+      } else {
+        await editComment(comment.id, text);
+      }
+      await queryClient.invalidateQueries({ queryKey: ["comments"] });
+      setIsEditing(false);
+      Keyboard.dismiss();
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro ao editar. Tente novamente.");
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      isReply ? "Excluir resposta" : "Excluir comentário",
+      "Tem certeza que deseja excluir? Essa ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              if (isReply) {
+                await deleteReply(comment.id);
+              } else {
+                await deleteComment(comment.id);
+              }
+              await queryClient.invalidateQueries({ queryKey: ["comments"] });
+            } catch (e) {
+              console.error(e);
+              toast.error("Erro ao excluir. Tente novamente.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -264,15 +384,23 @@ export function CommentItem({
             )}
           </View>
 
-          <Text
-            style={{
-              fontSize: 14,
-              color: C.textPrimary,
-              lineHeight: 21,
-            }}
-          >
-            {comment.text}
-          </Text>
+          {isEditing ? (
+            <EditInput
+              initialValue={comment.text}
+              onSubmit={handleEditSubmit}
+              onCancel={() => setIsEditing(false)}
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 14,
+                color: C.textPrimary,
+                lineHeight: 21,
+              }}
+            >
+              {comment.text}
+            </Text>
+          )}
 
           <View
             style={{
@@ -298,6 +426,22 @@ export function CommentItem({
                 Responder
               </Text>
             </TouchableOpacity>
+
+            {isOwner && !isEditing && (
+              <>
+                <TouchableOpacity onPress={() => setIsEditing(true)} activeOpacity={0.7}>
+                  <Text style={{ fontSize: 12, fontWeight: "600", color: C.textSecondary }}>
+                    Editar
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleDelete} activeOpacity={0.7}>
+                  <Text style={{ fontSize: 12, fontWeight: "600", color: C.danger }}>
+                    Excluir
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </View>
       </View>

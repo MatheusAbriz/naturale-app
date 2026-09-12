@@ -29,3 +29,19 @@ export function getReplies(commentId: number) {
 export function addReply(reply: CreateReply) {
     return API.post<CommentDTO>("/comments/reply", reply);
 }
+
+export function editComment(commentId: number, comment_text: string) {
+    return API.patch(`/comments/${commentId}`, { comment_text });
+}
+
+export function deleteComment(commentId: number) {
+    return API.delete(`/comments/${commentId}`);
+}
+
+export function editReply(commentId: number, comment_text: string) {
+    return API.patch(`/comments/reply/${commentId}`, { comment_text });
+}
+
+export function deleteReply(commentId: number) {
+    return API.delete(`/comments/reply/${commentId}`);
+}

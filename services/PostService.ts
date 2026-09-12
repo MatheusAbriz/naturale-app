@@ -1,6 +1,6 @@
 import { API } from "@/hooks/useApi";
 import { Paginated } from "@/types/pagination/PaginationTypes";
-import { Posts, type CreatePostDTO } from "@/types/posts/PostTypes";
+import { Posts, type CreatePostDTO, type UpdatePostDTO } from "@/types/posts/PostTypes";
 
 export function getPosts(page = 1, search="") {
     return API.get<Paginated<Posts[]>>(`/posts?page=${page}&search=${search}`);
@@ -24,4 +24,12 @@ export function insertFavorite(postId: number | string) {
 
 export async function createPost(data: CreatePostDTO) {
     return API.post("/posts", data);
+}
+
+export async function updatePost(postId: number, data: UpdatePostDTO) {
+    return API.put(`/posts/${postId}`, data);
+}
+
+export async function deletePost(postId: number) {
+    return API.delete(`/posts/${postId}`);
 }
