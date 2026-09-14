@@ -14,6 +14,10 @@ export function getFavoritesPosts(page=1) {
     return API.get<Paginated<Posts[]>>(`/favorites?page=${page}`)
 }
 
+export function getPostsByUser(userId: number | string, page = 1) {
+    return API.get<Paginated<Posts[]>>(`/posts/user/${userId}?page=${page}`);
+}
+
 export function insertLike(postId: number | string) {
     return API.patch(`/posts/${postId}/like`);
 }

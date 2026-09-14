@@ -1,6 +1,7 @@
 import BackgroundLogin from "@/assets/images/login-background.png";
 import Logo from "@/assets/images/white-logo.svg";
 import { Input } from "@/components/inputs/input";
+import { PublicRoute } from "@/components/PublicRoute";
 import { theme } from "@/globals/theme";
 import { login } from "@/services/AuthService";
 import { useLoader } from "@/stores/loader-store";
@@ -43,6 +44,7 @@ export default function Login() {
     }
 
     return (
+        <PublicRoute>
         <Container>
             <ImageBackground source={BackgroundLogin} resizeMode="cover" />
 
@@ -84,5 +86,6 @@ export default function Login() {
                 </FormArea>
             </KeyboardAvoidingView>
         </Container>
+        </PublicRoute>
     );
 };

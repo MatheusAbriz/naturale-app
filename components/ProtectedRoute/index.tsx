@@ -8,8 +8,9 @@ import { useAuth } from "@/stores/auth-store";
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { loading } = useLoader();
   const isAuthenticated = useAuth((state) => state.isAuthenticated);
+  const hasHydrated = useAuth((state) => state.hasHydrated);
 
-  if (loading) return <Loader />;
+  if (!hasHydrated || loading) return <Loader />;
   if (!isAuthenticated) return <Redirect href="/login" />;
 
   return <>{children}</>;

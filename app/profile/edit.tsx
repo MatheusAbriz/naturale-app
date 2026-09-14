@@ -1,5 +1,7 @@
 import { Input } from "@/components/inputs/input";
+import { EmptyList } from "@/components/notFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Skeleton } from "@/components/skeleton";
 import { theme } from "@/globals/theme";
 import {
     getMyProfile,
@@ -55,6 +57,8 @@ export default function EditProfile() {
     const router = useRouter();
     const [avatarAsset, setAvatarAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
     const [original, setOriginal] = useState<UserProfile | null>(null);
+    const [isFetchingProfile, setIsFetchingProfile] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
 
     const { control, getValues, setValue, watch } = useForm<FormValues>({
         defaultValues: { name: "", username: "", phone: "", email: "", avatar: "", password: "" },
@@ -74,7 +78,10 @@ export default function EditProfile() {
             setValue("avatar", profile.avatar ?? "");
         }).catch((e) => {
             console.error(e);
+            setFetchError(true);
             toast.error("Erro ao carregar seu perfil.");
+        }).finally(() => {
+            setIsFetchingProfile(false);
         });
     }, [user?.id]);
 
@@ -107,6 +114,7 @@ export default function EditProfile() {
 
             if (!name.trim()) return toast.error("Informe seu nome.");
             if (!email.trim()) return toast.error("Informe seu e-mail.");
+            if (!phone.trim()) return toast.error("Informe seu telefone.");
 
             const updates: Promise<unknown>[] = [];
             const storeUpdates: Record<string, string> = {};
@@ -153,6 +161,29 @@ export default function EditProfile() {
         } finally {
             setLoading(false);
         }
+    }
+
+    if (isFetchingProfile) {
+        return (
+            <ProtectedRoute>
+                <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.white }} edges={["top", "bottom"]}>
+                    <Skeleton />
+                </SafeAreaView>
+            </ProtectedRoute>
+        );
+    }
+
+    if (fetchError || !original) {
+        return (
+            <ProtectedRoute>
+                <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.white }} edges={["top", "bottom"]}>
+                    <BackButton onPress={() => router.back()}>
+                        <IonIcon name="arrow-back" size={22} color={theme.colors.lightBlack} />
+                    </BackButton>
+                    <EmptyList />
+                </SafeAreaView>
+            </ProtectedRoute>
+        );
     }
 
     return (

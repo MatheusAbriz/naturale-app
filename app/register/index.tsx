@@ -1,4 +1,5 @@
 import { Input } from "@/components/inputs/input";
+import { PublicRoute } from "@/components/PublicRoute";
 import { theme } from "@/globals/theme";
 import { register } from "@/services/AuthService";
 import { uploadImage } from "@/services/ImageService";
@@ -107,6 +108,7 @@ export default function Register() {
     }
 
     return (
+        <PublicRoute>
         <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.lightGreen }} edges={["top"]}>
             <Container behavior={Platform.OS === "ios" ? "padding" : "height"}>
                 <ScrollArea showsVerticalScrollIndicator={false}>
@@ -200,5 +202,6 @@ export default function Register() {
                 </ScrollArea>
             </Container>
         </SafeAreaView>
+        </PublicRoute>
     );
 }

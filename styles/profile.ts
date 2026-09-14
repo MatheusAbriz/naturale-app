@@ -77,3 +77,32 @@ export const InfoText = styled.Text`
     font-size: 15px;
     color: ${theme.colors.lightBlack};
 `;
+
+export const StatsRow = styled.View`
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 20px 24px;
+`;
+
+export const StatBlock = styled.View`
+    align-items: center;
+    gap: 2px;
+`;
+
+export const StatNumber = styled.Text`
+    font-size: 18px;
+    font-weight: 700;
+    color: ${theme.colors.heavyBlack};
+`;
+
+export const StatLabel = styled.Text`
+    font-size: 12px;
+    color: ${theme.colors.heavyGray};
+`;
+
+export const SectionTitle = styled.Text`
+    font-size: 15px;
+    font-weight: 700;
+    color: ${theme.colors.lightBlack};
+    padding: 0 16px 8px;
+`;

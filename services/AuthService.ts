@@ -1,5 +1,5 @@
 import { API } from "@/hooks/useApi";
-import type { UserDTO, UserProfile, UserSimpleDetails } from "@/types/auth";
+import type { UserDTO, UserProfile, UserSimpleDetails, UserStats } from "@/types/auth";
 
 export function login(data: { email: string, password: string }) {
     return API.post("/user/login", data);
@@ -17,6 +17,10 @@ export function getPublicProfile(userId: number | string) {
 // Perfil completo do próprio usuário (protegido, IDOR-checked no backend)
 export function getMyProfile(userId: number | string) {
     return API.get<UserProfile>(`/user/profile/${userId}`);
+}
+
+export function getUserStats(userId: number | string) {
+    return API.get<UserStats>(`/user/${userId}/stats`);
 }
 
 export function updateName(userId: number | string, name: string) {

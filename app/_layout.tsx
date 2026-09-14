@@ -57,7 +57,7 @@ function RootContent() {
       />
       {(isAuthenticated && search) && <IconSearch />}
       {(isAuthenticated && !pathname.includes("postForm")) && <CreatePost />}
-      {(isAuthenticated && footer) && <Footer />}
+      {(isAuthenticated && footer && !pathname.includes("postForm")) && <Footer />}
     </>
   );
 }

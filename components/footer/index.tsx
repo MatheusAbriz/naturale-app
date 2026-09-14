@@ -7,13 +7,11 @@ import { Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FavoriteBorder from "react-native-vector-icons/MaterialIcons";
 import { FooterView, IconContainer, TextIcon } from "./styles";
-import { useAuth } from "@/stores/auth-store";
 import { useState } from "react";
 import { SearchOverlayModal } from "../modals/modalSearch";
 import { useSearch } from "@/stores/search-store";
 
 export function Footer() {
-  const logout = useAuth((state) => state.logout);
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const router = useRouter();
@@ -22,6 +20,7 @@ export function Footer() {
   const isHomeActive = (pathname.includes("home") || pathname === "/");
   const isFavoritesActive = pathname.includes("favorites");
   const isChatActive = pathname.includes("chat");
+  const isSettingsActive = pathname.includes("settings");
 
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -105,10 +104,14 @@ export function Footer() {
         </IconContainer>
       </Pressable>
 
-      <Pressable onPress={() => logout()}>
+      <Pressable onPress={() => router.push("/settings")}>
         <IconContainer>
-          <TextIcon isActive={false}>Sair</TextIcon>
-          <Ionicons name="log-out-outline" size={24} color={theme.colors.lightGreen} />
+          <TextIcon isActive={isSettingsActive}>Config.</TextIcon>
+          {isSettingsActive ? (
+            <Ionicons name="settings" size={24} color={theme.colors.states.activeGreen} />
+          ) : (
+            <Ionicons name="settings-outline" size={24} color={theme.colors.lightGreen} />
+          )}
         </IconContainer>
       </Pressable>
     </FooterView>

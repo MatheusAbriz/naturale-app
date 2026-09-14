@@ -20,6 +20,12 @@ export type UserProfile = {
   avatar: string;
 };
 
+export type UserStats = {
+  postCount: number;
+  likesReceived: number;
+  commentsReceived: number;
+};
+
 export type UserSimpleDetails = {
   id: number,
   name: string,

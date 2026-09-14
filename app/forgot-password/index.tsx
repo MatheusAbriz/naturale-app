@@ -1,4 +1,5 @@
 import { Input } from "@/components/inputs/input";
+import { PublicRoute } from "@/components/PublicRoute";
 import { theme } from "@/globals/theme";
 import { forgotPassword, resetPassword } from "@/services/AuthService";
 import { useLoader } from "@/stores/loader-store";
@@ -73,6 +74,7 @@ export default function ForgotPassword() {
     }
 
     return (
+        <PublicRoute>
         <Container behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <BackButton onPress={() => router.back()}>
                 <IonIcon name="arrow-back" size={22} color={theme.colors.lightBlack} />
@@ -131,5 +133,6 @@ export default function ForgotPassword() {
                 </>
             )}
         </Container>
+        </PublicRoute>
     );
 }

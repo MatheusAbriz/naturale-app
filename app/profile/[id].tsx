@@ -1,12 +1,19 @@
+import { PostCard } from "@/components/card";
+import Comment from "@/components/comment";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Skeleton } from "@/components/skeleton";
 import { EmptyList } from "@/components/notFound";
 import { theme } from "@/globals/theme";
-import { getMyProfile, getPublicProfile } from "@/services/AuthService";
+import { getMyProfile, getPublicProfile, getUserStats } from "@/services/AuthService";
+import { getPostsByUser } from "@/services/PostService";
 import { useAuth } from "@/stores/auth-store";
+import { useFooter } from "@/stores/hide-footer-store";
 import { UserProfile, UserSimpleDetails } from "@/types/auth";
-import { useQuery } from "@tanstack/react-query";
+import { Posts } from "@/types/posts/PostTypes";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, FlatList, View } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -19,6 +26,11 @@ import {
     InfoRow,
     InfoText,
     Name,
+    SectionTitle,
+    StatBlock,
+    StatLabel,
+    StatNumber,
+    StatsRow,
     Username,
 } from "@/styles/profile";
 
@@ -28,6 +40,8 @@ export default function Profile() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { user } = useAuth.getState();
+    const showFooter = useFooter((state) => state.setFooter);
+    const [selectedPost, setSelectedPost] = useState<Posts | null>(null);
     const isOwnProfile = Number(id) === user?.id;
 
     const { data, isLoading, isError } = useQuery({
@@ -42,6 +56,46 @@ export default function Profile() {
         },
         enabled: !!id,
     });
+
+    const { data: stats } = useQuery({
+        queryKey: ["profile-stats", Number(id)],
+        queryFn: async () => {
+            const res = await getUserStats(id);
+            return res.data;
+        },
+        enabled: !!id,
+    });
+
+    const {
+        data: postsPages,
+        isLoading: isLoadingPosts,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+    } = useInfiniteQuery({
+        queryKey: ["user-posts", Number(id)],
+        queryFn: ({ pageParam = 1 }) => getPostsByUser(id, pageParam),
+        enabled: !!id,
+        initialPageParam: 1,
+        staleTime: 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        getNextPageParam: (lastPage) => {
+            const { page, totalPages } = lastPage.data.pagination;
+            return page < totalPages ? page + 1 : undefined;
+        },
+    });
+
+    const posts = postsPages?.pages.flatMap((page) => page.data.data) ?? [];
+
+    const handleOpenComments = useCallback((post: Posts) => {
+        showFooter(false);
+        setSelectedPost(post);
+    }, []);
+
+    const handleCloseComments = useCallback(() => {
+        showFooter(true);
+        setSelectedPost(null);
+    }, []);
 
     if (isLoading) return <Skeleton />;
 
@@ -66,30 +120,84 @@ export default function Profile() {
                         </EditButton>
                     )}
 
-                    <Header>
-                        <AvatarImage source={{ uri: data.avatar || FALLBACK_AVATAR }} />
-                        <Name>{data.name}</Name>
-                        <Username>@{data.username}</Username>
-                    </Header>
+                    <FlatList
+                        style={{ width: "100%" }}
+                        contentContainerStyle={{ paddingBottom: 60 }}
+                        data={isLoadingPosts ? Array(4).fill({}) : posts}
+                        keyExtractor={(item: Posts, index) =>
+                            isLoadingPosts ? index.toString() : item?.postId?.toString()
+                        }
+                        ListHeaderComponent={
+                            <>
+                                <Header>
+                                    <AvatarImage source={{ uri: data.avatar || FALLBACK_AVATAR }} />
+                                    <Name>{data.name}</Name>
+                                    <Username>@{data.username}</Username>
+                                </Header>
 
-                    {isOwnProfile && (
-                        <InfoArea>
-                            {!!email && (
-                                <InfoRow>
-                                    <IonIcon name="mail-outline" size={18} color={theme.colors.lightGreen} />
-                                    <InfoText>{email}</InfoText>
-                                </InfoRow>
-                            )}
-                            {!!phone && (
-                                <InfoRow>
-                                    <IonIcon name="call-outline" size={18} color={theme.colors.lightGreen} />
-                                    <InfoText>{phone}</InfoText>
-                                </InfoRow>
-                            )}
-                        </InfoArea>
-                    )}
+                                {isOwnProfile && (
+                                    <InfoArea>
+                                        {!!email && (
+                                            <InfoRow>
+                                                <IonIcon name="mail-outline" size={18} color={theme.colors.lightGreen} />
+                                                <InfoText>{email}</InfoText>
+                                            </InfoRow>
+                                        )}
+                                        {!!phone && (
+                                            <InfoRow>
+                                                <IonIcon name="call-outline" size={18} color={theme.colors.lightGreen} />
+                                                <InfoText>{phone}</InfoText>
+                                            </InfoRow>
+                                        )}
+                                    </InfoArea>
+                                )}
+
+                                <StatsRow>
+                                    <StatBlock>
+                                        <StatNumber>{stats?.postCount ?? 0}</StatNumber>
+                                        <StatLabel>Posts</StatLabel>
+                                    </StatBlock>
+                                    <StatBlock>
+                                        <StatNumber>{stats?.likesReceived ?? 0}</StatNumber>
+                                        <StatLabel>Curtidas</StatLabel>
+                                    </StatBlock>
+                                    <StatBlock>
+                                        <StatNumber>{stats?.commentsReceived ?? 0}</StatNumber>
+                                        <StatLabel>Comentários</StatLabel>
+                                    </StatBlock>
+                                </StatsRow>
+
+                                <SectionTitle>Receitas</SectionTitle>
+                            </>
+                        }
+                        ListEmptyComponent={!isLoadingPosts ? <EmptyList /> : null}
+                        renderItem={({ item }) =>
+                            isLoadingPosts ? (
+                                <Skeleton />
+                            ) : (
+                                <PostCard post={item} onOpenComments={handleOpenComments} />
+                            )
+                        }
+                        onEndReached={() => {
+                            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+                        }}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={
+                            isFetchingNextPage ? (
+                                <View style={{ paddingVertical: 16 }}>
+                                    <ActivityIndicator color={theme.colors.lightGreen} />
+                                </View>
+                            ) : null
+                        }
+                    />
                 </Container>
             </SafeAreaView>
+
+            <Comment
+                post={selectedPost}
+                isOpen={!!selectedPost}
+                onClose={handleCloseComments}
+            />
         </ProtectedRoute>
     );
 }

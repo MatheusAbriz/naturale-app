@@ -35,7 +35,6 @@ import {
     TimeChipText,
     TimeGrid,
 } from "@/styles/postForm";
-import { Footer } from "@/components/footer";
 import { useQueryClient } from "@tanstack/react-query";
 
 const TIME_OPTIONS = ["15min", "30min", "45min", "1h", "1h30", "2h", "2h30", "3h+"];
@@ -293,7 +292,6 @@ export default function CreatePost() {
                     </Container>
                 </KeyboardAvoidingView>
             </SafeAreaView>
-            <Footer />
         </ProtectedRoute>
     );
 }

@@ -194,9 +194,9 @@ export default function PostDetail() {
                                 </ActionItem>
 
                                 <ActionItem>
-                                    {/* <TouchableOpacity onPress={handleOpenComments}> */}
-                                    <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
-                                    {/* </TouchableOpacity> */}
+                                    <TouchableOpacity onPress={handleOpenComments}>
+                                        <AwesomeIcon name="comment-o" size={20} color={theme.colors.black} />
+                                    </TouchableOpacity>
                                     <ActionText>{data?.commentCount ?? 0}</ActionText>
                                 </ActionItem>
                             </ActionGroup>
